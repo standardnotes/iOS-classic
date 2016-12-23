@@ -4,9 +4,3 @@
 [submodule "vendor/SwiftyJSON"]
 	path = vendor/SwiftyJSON
 	url = https://github.com/SwiftyJSON/SwiftyJSON.git
-[submodule "vendor/CryptoSwift"]
-	path = vendor/CryptoSwift
-	url = https://github.com/krzyzanowskim/CryptoSwift.git
-[submodule "vendor/RNCryptor"]
-	path = vendor/RNCryptor
-	url = https://github.com/RNCryptor/RNCryptor.git
