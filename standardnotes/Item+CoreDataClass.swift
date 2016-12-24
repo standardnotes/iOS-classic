@@ -24,6 +24,7 @@ public class Item: NSManagedObject {
         self.encItemKey = json["enc_item_key"].string
         self.presentationName = json["presentation_name"].string
         self.content = json["content"].string!
+        self.url = json["presentation_url"].string
 
         mapContentToLocalProperties(contentObject: contentObject)
     }
@@ -50,7 +51,6 @@ public class Item: NSManagedObject {
     
     func buildFullContentObject() -> JSON {
         var params = [String : Any]()
-        params["uuid"] = self.uuid
         params.merge(with: structureParams())
         return JSON(params)
     }

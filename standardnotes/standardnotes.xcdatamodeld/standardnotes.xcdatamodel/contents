@@ -7,6 +7,7 @@
         <attribute name="draft" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="encItemKey" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="presentationName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="uuid" attributeType="String" syncable="YES"/>
         <compoundIndexes>
             <compoundIndex>
@@ -28,7 +29,7 @@
         <attribute name="uuid" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Item" positionX="-63" positionY="-18" width="128" height="150"/>
+        <element name="Item" positionX="-63" positionY="-18" width="128" height="165"/>
         <element name="Note" positionX="-54" positionY="18" width="128" height="90"/>
         <element name="User" positionX="-45" positionY="18" width="128" height="75"/>
         <element name="Tag" positionX="-54" positionY="27" width="128" height="75"/>

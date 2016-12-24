@@ -38,7 +38,7 @@ class NotesViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         if viewDidDisappear {
             viewDidDisappear = false
-            ApiController.sharedInstance.saveDirtyItems {
+            ApiController.sharedInstance.saveDirtyItems { error in
                 
             }
         }
@@ -102,6 +102,52 @@ class NotesViewController: UIViewController {
             print("Error fetching: \(error)")
         }
     }
+    
+    func presentActionSheetForNote(note: Note) {
+        let alertController = UIAlertController(title: note.url, message: nil, preferredStyle: .actionSheet)
+        
+        let shareAction = UIAlertAction(title: "Share", style: .default, handler: {
+            alert -> Void in
+            ApiController.sharedInstance.shareItem(item: note, completion: { (error) in
+                if error != nil {
+                    self.showAlert(title: "Oops", message: error!.localizedDescription)
+                } else {
+                    self.tableView.reloadData()
+                }
+            })
+        })
+        
+        let openInSafariAction = UIAlertAction(title: "View In Safari", style: .default, handler: {
+            alert -> Void in
+            UIApplication.shared.open(URL(string: note.url!)!, options: [:], completionHandler: nil)
+        })
+        
+        let unshareAction = UIAlertAction(title: "Unshare", style: .default, handler: {
+            alert -> Void in
+            ApiController.sharedInstance.unshareItem(item: note, completion: { (error) in
+                if error != nil {
+                    self.showAlert(title: "Oops", message: error!.localizedDescription)
+                } else {
+                    self.tableView.reloadData()
+                }
+            })
+        })
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: {
+            (action : UIAlertAction!) -> Void in
+            
+        })
+        
+        if note.isPublic {
+            alertController.addAction(unshareAction)
+            alertController.addAction(openInSafariAction)
+        } else {
+            alertController.addAction(shareAction)
+        }
+        alertController.addAction(cancelAction)
+        
+        self.present(alertController, animated: true, completion: nil)
+    }
 }
 
 extension NotesViewController : UITableViewDelegate, UITableViewDataSource {
@@ -110,6 +156,10 @@ extension NotesViewController : UITableViewDelegate, UITableViewDataSource {
         let selectedObject = resultsController.object(at: indexPath as IndexPath) as Note
         cell.titleLabel?.text = selectedObject.safeTitle()
         cell.contentLabel?.text = selectedObject.safeText()
+        cell.note = selectedObject
+        cell.longPressHandler = { cell in
+            self.presentActionSheetForNote(note: cell.note)
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

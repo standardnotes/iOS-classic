@@ -18,7 +18,7 @@ class ApiController {
     
     init() {
         NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: ApiController.DirtyChangeMadeNotification), object: nil, queue: OperationQueue.main) { (notification) in
-            self.saveDirtyItems {
+            self.saveDirtyItems { error in
                 
             }
         }
@@ -160,21 +160,23 @@ class ApiController {
         }
     }
     
-    func saveDirtyItems(completion: @escaping () -> ()) {
+    func saveDirtyItems(completion: @escaping (Error?) -> ()) {
         let dirty = ItemManager.sharedInstance.fetchDirty()
         if dirty.count == 0 {
-            completion()
+            completion(nil)
             return
         }
         
-        saveItems(items: dirty, completion: { (items) in
-            ItemManager.sharedInstance.clearDirty(items: items)
+        saveItems(items: dirty, completion: { (items, error) in
+            if error == nil {
+                ItemManager.sharedInstance.clearDirty(items: items!)
+            }
             print("Items after setting dirty = false: \(items)")
-            completion()
+            completion(error)
         })
     }
     
-    func saveItems(items: [Item], completion: @escaping ([Item]) -> ()) {
+    func saveItems(items: [Item], completion: @escaping ([Item]?, Error?) -> ()) {
         let itemParams = items.map { (item) -> [String : String] in
             return self.createParamsFromItem(item: item)
         }
@@ -182,12 +184,13 @@ class ApiController {
         Alamofire.request("\(self.server)/items", method: .post, parameters: ["items" : itemParams], headers: headers()).responseJSON { response in
             if let error = response.result.error {
                 print("Error saving items: \(error)")
+                completion(nil, error)
             } else {
                 let json = JSON(data: response.data!)
                 print("\nSave items response: \(json)")
                 var jsonItems = json["items"].array!
                 let items = self.handleItemsResponse(responseItems: &jsonItems)
-                completion(items)
+                completion(items, nil)
             }
         }
     }
@@ -196,6 +199,7 @@ class ApiController {
         var params = [String : String]()
         params["content_type"] = item.contentType
         params["uuid"] = item.uuid
+        params["presentation_name"] = item.presentationName
         if(item.isPublic) {
             // send decrypted
             params["enc_item_key"] = nil
@@ -211,8 +215,24 @@ class ApiController {
     func handleItemsResponse(responseItems: inout [JSON]) -> [Item] {
         Crypto.sharedInstance.decryptItems(items: &responseItems)
         let items = ItemManager.sharedInstance.mapResponseItemsToLocalItems(responseItems: responseItems)
-//        print("Response Items After Mapping: \(items)")
         return items
+    }
+    
+    
+    func shareItem(item: Item, completion: @escaping (Error?) -> ()) {
+        item.presentationName = "_auto_"
+        item.dirty = true
+        saveDirtyItems { (error) in
+            completion(error)
+        }
+    }
+    
+    func unshareItem(item: Item, completion: @escaping (Error?) -> ()) {
+        item.presentationName = nil
+        item.dirty = true
+        saveDirtyItems { (error) in
+            completion(error)
+        }
     }
     
 }
