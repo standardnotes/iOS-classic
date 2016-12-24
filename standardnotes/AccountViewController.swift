@@ -10,11 +10,14 @@ import UIKit
 
 class AccountViewController: UITableViewController {
     
+    @IBOutlet weak var signInButton: UIButton!
+    @IBOutlet weak var registerButton: UIButton!
     @IBOutlet weak var serverTextField: UITextField!
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
+    @IBOutlet weak var signOutButton: UIButton!
     
-    @IBOutlet weak var accountActionLabel: UILabel!
+    var accountStatusChanged: ((Bool) -> ())!
    
     let ActionIndex = 3
     
@@ -24,27 +27,27 @@ class AccountViewController: UITableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
         reloadData()
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if indexPath.row == ActionIndex {
-            if UserManager.sharedInstance.signedIn {
-                signOut()
-            } else {
-                signIn()
-            }
-        }
+
+
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
     func reloadData() {
+        
         if UserManager.sharedInstance.signedIn {
-            self.accountActionLabel.text = "Sign Out"
+            self.signInButton.isEnabled = false
+            self.registerButton.isEnabled = false
+            self.signOutButton.isEnabled = true
         } else {
-            self.accountActionLabel.text = "Sign In"
+            self.signInButton.isEnabled = true
+            self.registerButton.isEnabled = true
+            self.signOutButton.isEnabled = false
         }
+
         
         self.serverTextField.isEnabled = !UserManager.sharedInstance.signedIn
         self.emailTextField.isEnabled = !UserManager.sharedInstance.signedIn
@@ -62,10 +65,11 @@ class AccountViewController: UITableViewController {
         UserManager.sharedInstance.save()
     }
     
+    @IBAction func signOutPressed(_ sender: Any) {
+        signOut()
+    }
+    
     func signOut() {
-//        self.serverTextField.text = nil
-//        self.emailTextField.text = nil
-//        self.passwordTextField.text = nil
         UserManager.sharedInstance.clear()
         reloadData()
     }
@@ -78,15 +82,46 @@ class AccountViewController: UITableViewController {
         return UserManager.sharedInstance.password
     }
     
-    func signIn() {
-        
+    @IBAction func signInPressed(_ sender: Any) {
         saveFields()
         
         if email == nil || password == nil {
             return
         }
         
-        ApiController.sharedInstance.signInUser(email: email!, password: password!) { (user) in
+        signIn()
+    }
+
+    @IBAction func registerPressed(_ sender: Any) {
+        saveFields()
+        
+        if email == nil || password == nil {
+            return
+        }
+        
+        register()
+    }
+    
+    func register() {
+        ApiController.sharedInstance.register(email: email!, password: password!) { (error) in
+            if error != nil {
+                self.showAlert(title: "Oops", message: error!.localizedDescription)
+                return
+            }
+            self.accountStatusChanged(true)
+            self.reloadData()
+        }
+    }
+    
+    
+    func signIn() {
+        
+        ApiController.sharedInstance.signInUser(email: email!, password: password!) { (error) in
+            if error != nil {
+                self.showAlert(title: "Oops", message: error!.localizedDescription)
+                return
+            }
+            self.accountStatusChanged(true)
             self.reloadData()
         }
     }

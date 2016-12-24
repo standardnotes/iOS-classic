@@ -35,6 +35,7 @@
 		B89178E21E0D86D500163EA7 /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89178E11E0D86D500163EA7 /* TabBarViewController.swift */; };
 		B89178E41E0DBDC500163EA7 /* NoteTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89178E31E0DBDC500163EA7 /* NoteTableViewCell.swift */; };
 		B89178E81E0DC81500163EA7 /* TagTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89178E71E0DC81500163EA7 /* TagTableViewCell.swift */; };
+		CDAAB63F1E0DE3B30033487A /* ViewController+Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDAAB63E1E0DE3B30033487A /* ViewController+Util.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -127,7 +128,7 @@
 		B82B6E1B1E08B8730025C3EC /* User+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "User+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		B82B6E201E08BC1D0025C3EC /* Alamofire.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Alamofire.xcodeproj; path = vendor/Alamofire/Alamofire.xcodeproj; sourceTree = SOURCE_ROOT; };
 		B872EC781E08C38500CC7656 /* SwiftyJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftyJSON.swift; path = vendor/SwiftyJSON/Source/SwiftyJSON.swift; sourceTree = SOURCE_ROOT; };
-		B872EC871E08D00400CC7656 /* standardnotes-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "standardnotes-Bridging-Header.h"; sourceTree = "<group>"; };
+		B872EC871E08D00400CC7656 /* standardnotes-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "standardnotes-Bridging-Header.h"; sourceTree = SOURCE_ROOT; };
 		B878C49F1E09A1DD002A876F /* ItemManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ItemManager.swift; sourceTree = "<group>"; };
 		B878C4B11E09ADF6002A876F /* Crypto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Crypto.swift; sourceTree = "<group>"; };
 		B878C4B31E09BAC2002A876F /* NSData+Crypto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Crypto.h"; sourceTree = "<group>"; };
@@ -142,6 +143,7 @@
 		B89178E11E0D86D500163EA7 /* TabBarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
 		B89178E31E0DBDC500163EA7 /* NoteTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoteTableViewCell.swift; sourceTree = "<group>"; };
 		B89178E71E0DC81500163EA7 /* TagTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TagTableViewCell.swift; sourceTree = "<group>"; };
+		CDAAB63E1E0DE3B30033487A /* ViewController+Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ViewController+Util.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -160,10 +162,10 @@
 			isa = PBXGroup;
 			children = (
 				B82B6DFE1E08AA660025C3EC /* Main.storyboard */,
-				B89178E11E0D86D500163EA7 /* TabBarViewController.swift */,
 				B89178E51E0DBDC800163EA7 /* Notes */,
-				B809F2B71E0B5164007D5700 /* ComposeViewController.swift */,
 				B89178E61E0DC80600163EA7 /* Tags */,
+				B89178E11E0D86D500163EA7 /* TabBarViewController.swift */,
+				B809F2B71E0B5164007D5700 /* ComposeViewController.swift */,
 				B89178DD1E0D7D8300163EA7 /* AccountViewController.swift */,
 			);
 			name = "View Controllers";
@@ -174,7 +176,6 @@
 			children = (
 				B82B6DF91E08AA660025C3EC /* standardnotes */,
 				B82B6DF81E08AA660025C3EC /* Products */,
-				B872EC871E08D00400CC7656 /* standardnotes-Bridging-Header.h */,
 			);
 			sourceTree = "<group>";
 		};
@@ -191,16 +192,11 @@
 			children = (
 				B82B6DFA1E08AA660025C3EC /* AppDelegate.swift */,
 				B809F2B91E0B5173007D5700 /* View Controllers */,
-				B82B6E171E08AC8C0025C3EC /* ApiController.swift */,
-				B878C4B11E09ADF6002A876F /* Crypto.swift */,
-				B878C49F1E09A1DD002A876F /* ItemManager.swift */,
-				B89178DF1E0D84C200163EA7 /* UserManager.swift */,
+				CDAAB6411E0DE4D30033487A /* Controllers */,
+				CDAAB6401E0DE4CD0033487A /* Extensions */,
 				B82B6E1E1E08B8900025C3EC /* Model */,
-				B82B6E041E08AA660025C3EC /* Assets.xcassets */,
-				B82B6E061E08AA660025C3EC /* LaunchScreen.storyboard */,
-				B82B6E091E08AA660025C3EC /* Info.plist */,
+				CDAAB6421E0DE4DE0033487A /* Supporting Files */,
 				B82B6E1F1E08BC150025C3EC /* Vendor */,
-				B82B6E011E08AA660025C3EC /* standardnotes.xcdatamodeld */,
 			);
 			path = standardnotes;
 			sourceTree = "<group>";
@@ -208,6 +204,7 @@
 		B82B6E1E1E08B8900025C3EC /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				B82B6E011E08AA660025C3EC /* standardnotes.xcdatamodeld */,
 				B82B6E131E08AC230025C3EC /* Item+CoreDataClass.swift */,
 				B82B6E141E08AC230025C3EC /* Item+CoreDataProperties.swift */,
 				B878C4CA1E0A5116002A876F /* Note+CoreDataClass.swift */,
@@ -261,6 +258,36 @@
 				B89178E71E0DC81500163EA7 /* TagTableViewCell.swift */,
 			);
 			name = Tags;
+			sourceTree = "<group>";
+		};
+		CDAAB6401E0DE4CD0033487A /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				CDAAB63E1E0DE3B30033487A /* ViewController+Util.swift */,
+			);
+			name = Extensions;
+			sourceTree = "<group>";
+		};
+		CDAAB6411E0DE4D30033487A /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				B82B6E171E08AC8C0025C3EC /* ApiController.swift */,
+				B878C4B11E09ADF6002A876F /* Crypto.swift */,
+				B878C49F1E09A1DD002A876F /* ItemManager.swift */,
+				B89178DF1E0D84C200163EA7 /* UserManager.swift */,
+			);
+			name = Controllers;
+			sourceTree = "<group>";
+		};
+		CDAAB6421E0DE4DE0033487A /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				B872EC871E08D00400CC7656 /* standardnotes-Bridging-Header.h */,
+				B82B6E041E08AA660025C3EC /* Assets.xcassets */,
+				B82B6E061E08AA660025C3EC /* LaunchScreen.storyboard */,
+				B82B6E091E08AA660025C3EC /* Info.plist */,
+			);
+			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -409,6 +436,7 @@
 				B82B6DFB1E08AA660025C3EC /* AppDelegate.swift in Sources */,
 				B89178E41E0DBDC500163EA7 /* NoteTableViewCell.swift in Sources */,
 				B878C4CD1E0A5116002A876F /* Note+CoreDataProperties.swift in Sources */,
+				CDAAB63F1E0DE3B30033487A /* ViewController+Util.swift in Sources */,
 				B872EC791E08C38500CC7656 /* SwiftyJSON.swift in Sources */,
 				B82B6E161E08AC230025C3EC /* Item+CoreDataProperties.swift in Sources */,
 				B89178E21E0D86D500163EA7 /* TabBarViewController.swift in Sources */,

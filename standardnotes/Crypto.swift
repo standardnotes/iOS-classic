@@ -15,7 +15,17 @@ class Crypto {
         return Crypto()
     }()
     
+    func defaultPasswordGenerationParams() -> [String : Any] {
+        return [
+              "pw_func" : "pbkdf2",
+              "pw_alg": "sha512",
+              "pw_key_size": 512,
+              "pw_cost": 60000
+        ]
+    }
+    
     func pbkdf2(hash :CCPBKDFAlgorithm, password: String, salt: String, keyByteCount: Int, rounds: Int) -> String? {
+        print("Running pbkdf2 with \(password), \(salt), \(keyByteCount), \(rounds)")
         let saltData = salt.data(using: .utf8)!
         let passwordData = password.data(using:String.Encoding.utf8)!
         var derivedKeyData = Data(repeating:0, count:keyByteCount)
@@ -38,6 +48,11 @@ class Crypto {
         }
          
         return derivedKeyData.hexEncodedString()
+    }
+    
+    func sha1(message: String) -> String {
+        let result = SHA1(message.data(using: .utf8))
+        return result!.hexEncodedString()
     }
     
     
@@ -74,13 +89,17 @@ class Crypto {
         return result!.hexEncodedString()
     }
     
-    func setKey(forItem item: Item) {
-        // key required to be 512 bits
-        var data = Data(count: 512/8)
+    func generateRandomHexKey(size: Int) -> String {
+        var data = Data(count: size/8)
         let _ = data.withUnsafeMutableBytes { mutableBytes in
             SecRandomCopyBytes(kSecRandomDefault, data.count, mutableBytes)
         }
-        let hex = data.hexEncodedString()
+        return data.hexEncodedString()
+    }
+    
+    func setKey(forItem item: Item) {
+        // key required to be 512 bits
+        let hex = generateRandomHexKey(size: 512)
         print("Generated random key for item: \(hex)")
         // encrypt key with master key
         item.encItemKey = encrypt(message: hex, key: UserManager.sharedInstance.mk)
@@ -167,66 +186,3 @@ extension Data {
         return map { String(format: "%02hhx", $0) }.joined()
     }
 }
-
-enum CryptoAlgorithm {
-    case MD5, SHA1, SHA224, SHA256, SHA384, SHA512
-    
-    var HMACAlgorithm: CCHmacAlgorithm {
-        var result: Int = 0
-        switch self {
-        case .MD5:      result = kCCHmacAlgMD5
-        case .SHA1:     result = kCCHmacAlgSHA1
-        case .SHA224:   result = kCCHmacAlgSHA224
-        case .SHA256:   result = kCCHmacAlgSHA256
-        case .SHA384:   result = kCCHmacAlgSHA384
-        case .SHA512:   result = kCCHmacAlgSHA512
-        }
-        return CCHmacAlgorithm(result)
-    }
-    
-    var digestLength: Int {
-        var result: Int32 = 0
-        switch self {
-        case .MD5:      result = CC_MD5_DIGEST_LENGTH
-        case .SHA1:     result = CC_SHA1_DIGEST_LENGTH
-        case .SHA224:   result = CC_SHA224_DIGEST_LENGTH
-        case .SHA256:   result = CC_SHA256_DIGEST_LENGTH
-        case .SHA384:   result = CC_SHA384_DIGEST_LENGTH
-        case .SHA512:   result = CC_SHA512_DIGEST_LENGTH
-        }
-        return Int(result)
-    }
-}
-
-extension String {
-    
-    func hmac(algorithm: CryptoAlgorithm, key: String) -> String {
-        let str = self.cString(using: String.Encoding.utf8)
-        let strLen = Int(self.lengthOfBytes(using: String.Encoding.utf8))
-        let digestLen = algorithm.digestLength
-        let result = UnsafeMutablePointer<CUnsignedChar>.allocate(capacity: digestLen)
-        let keyStr = key.cString(using: String.Encoding.utf8)
-        let keyLen = Int(key.lengthOfBytes(using: String.Encoding.utf8))
-        
-        CCHmac(algorithm.HMACAlgorithm, keyStr!, keyLen, str!, strLen, result)
-        
-        let digest = stringFromResult(result: result, length: digestLen)
-        
-        result.deallocate(capacity: digestLen)
-        
-        return digest
-    }
-    
-    private func stringFromResult(result: UnsafeMutablePointer<CUnsignedChar>, length: Int) -> String {
-        let hash = NSMutableString()
-        for i in 0..<length {
-            hash.appendFormat("%02x", result[i])
-        }
-        return String(hash)
-    }
-    
-}
-
-
-
-

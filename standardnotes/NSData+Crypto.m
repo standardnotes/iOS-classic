@@ -52,3 +52,9 @@ extern NSData *HMAC256(NSData *messageData, NSData *keyData) {
     return result;
 }
 
+extern NSData *SHA1(NSData *messageData) {
+    NSMutableData *result = [[NSMutableData alloc] initWithLength:CC_SHA1_DIGEST_LENGTH];
+    CC_SHA1(messageData.bytes, (u_int32_t)messageData.length, result.mutableBytes);
+    return result;
+}
+

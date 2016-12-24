@@ -14,7 +14,17 @@ class TabBarViewController: UITabBarController {
         super.viewDidLoad()
         
         if UserManager.sharedInstance.signedIn == false {
-//            self.selectedIndex = 1
+            self.selectedIndex = 1
+        }
+        
+        if let accountNav = self.viewControllers!.last as? UINavigationController {
+            if let accountVc = accountNav.viewControllers.first as? AccountViewController {
+                accountVc.accountStatusChanged = { signIn in
+                    if signIn {
+                        self.selectedIndex = 0
+                    }
+                }
+            }
         }
     }
 

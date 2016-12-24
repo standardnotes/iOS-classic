@@ -10,3 +10,4 @@
 
 extern NSData * AES128CBC(NSString *op, NSData * data, NSData * key);
 extern NSData *HMAC256(NSData *data, NSData *keyData);
+extern NSData *SHA1(NSData *messageData);

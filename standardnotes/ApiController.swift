@@ -33,13 +33,17 @@ class ApiController {
         
     }
     
-    func getAuthParams(email: String, completion: @escaping (JSON) -> ()) {
+    func getAuthParams(email: String, completion: @escaping (JSON?, Error?) -> ()) {
         let parameters: Parameters = [
             "email": email,
             ]
         Alamofire.request("\(self.server)/auth/params", method: .get, parameters: parameters).responseJSON { response in
+            if response.result.error != nil {
+                completion(nil, response.result.error)
+                return
+            }
              let json = JSON(data: response.data!)
-            completion(json)
+            completion(json, nil)
             
         }
     }
@@ -48,10 +52,63 @@ class ApiController {
         return UserManager.sharedInstance.server
     }
     
-    func signInUser(email: String, password: String, completion: @escaping () -> ()) {
-        getAuthParams(email: email) { (authParams) in
+    func createRegistrationAuthParams(forEmail email: String) -> [String : AnyObject] {
+        let pwParams = Crypto.sharedInstance.defaultPasswordGenerationParams()
+        let nonce = Crypto.sharedInstance.generateRandomHexKey(size: 256)
+        let salt = Crypto.sharedInstance.sha1(message: email + "SN" + nonce);
+        print("\nRegistering with salt: \(salt)\n")
+        return pwParams.merged(with: ["pw_salt" : salt, "pw_nonce" : nonce]) as [String : AnyObject]
+    }
+    
+    
+    func register(email: String, password: String, completion: @escaping (Error?) -> ()) {
 
-            let result = Crypto.sharedInstance.pbkdf2(hash: CCPBKDFAlgorithm(kCCPRFHmacAlgSHA512), password: password, salt: authParams["pw_salt"].string!, keyByteCount: authParams["pw_key_size"].int!/8, rounds: authParams["pw_cost"].int!)!
+        let authParams = createRegistrationAuthParams(forEmail: email)
+        let result = Crypto.sharedInstance.pbkdf2(hash: CCPBKDFAlgorithm(kCCPRFHmacAlgSHA512), password: password, salt: authParams["pw_salt"] as! String, keyByteCount: (authParams["pw_key_size"] as! Int)/8, rounds: authParams["pw_cost"] as! Int)!
+        
+        let pw = result.firstHalf()
+        let mk = result.secondHalf()
+        UserManager.sharedInstance.mk = mk
+        UserManager.sharedInstance.save()
+        
+        let parameters: Parameters = [
+            "user" : [
+                "email": email,
+                "password" : pw,
+            ].merged(with: authParams)
+        ]
+        
+        print("Registering with pw: \(pw)")
+        
+        Alamofire.request("\(self.server)/auth", method: .post, parameters: parameters)
+            .validate(statusCode: 200..<300)
+            .responseJSON { response in
+            if response.result.error != nil {
+                completion(response.result.error)
+                return
+            }
+            let json = JSON(data: response.data!)
+            UserManager.sharedInstance.jwt = json["token"].string!
+            UserManager.sharedInstance.save()
+            if var jsonItems = json["items"].array {
+                let _ = self.handleItemsResponse(responseItems: &jsonItems)
+            }
+            completion(nil)
+        }
+        
+    }
+    
+    
+    func signInUser(email: String, password: String, completion: @escaping (Error?) -> ()) {
+        getAuthParams(email: email) { (authParams, error) in
+            
+            if error != nil {
+                completion(error)
+                return
+            }
+            
+
+            let result = Crypto.sharedInstance.pbkdf2(hash: CCPBKDFAlgorithm(kCCPRFHmacAlgSHA512), password: password, salt: authParams!["pw_salt"].string!, keyByteCount: authParams!["pw_key_size"].int!/8, rounds: authParams!["pw_cost"].int!)!
             let pw = result.firstHalf()
             let mk = result.secondHalf()
             UserManager.sharedInstance.mk = mk
@@ -63,14 +120,21 @@ class ApiController {
                     "password" : pw,
                     ]
                 ]
+            print("Signing in with pw: \(pw)")
             
-            Alamofire.request("\(self.server)/auth/sign_in", method: .post, parameters: parameters).responseJSON { response in
+            Alamofire.request("\(self.server)/auth/sign_in.json", method: .post, parameters: parameters)
+                .validate(statusCode: 200..<300)
+                .responseJSON { response in
+                if response.result.error != nil {
+                    completion(response.result.error)
+                    return
+                }
                 let json = JSON(data: response.data!)
                 UserManager.sharedInstance.jwt = json["token"].string!
                 UserManager.sharedInstance.save()
                 var jsonItems = json["items"].array!
                 let _ = self.handleItemsResponse(responseItems: &jsonItems)
-                completion()
+                completion(nil)
             }
         }
     }

@@ -23,11 +23,7 @@ class UserManager {
     }
     
     var email: String!
-    var password: String! {
-        didSet {
-            print("didSet password: \(password)")
-        }
-    }
+    var password: String!
     var server: String!
     var mk: String!
     var jwt: String!
@@ -44,7 +40,7 @@ class UserManager {
     }
     
     func persist() {
-        print("Saving \(email), \(password), \(server), \(jwt), \(mk)")
+        //        print("Saving \(email), \(password), \(server), \(jwt), \(mk)")
         UserDefaults.standard.synchronize()
     }
     
