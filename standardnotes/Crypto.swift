@@ -55,6 +55,14 @@ class Crypto {
         return result!.hexEncodedString()
     }
     
+    func base64(message: String) -> String {
+        return message.data(using: .utf8)!.base64EncodedString()
+    }
+    
+    func base64decode(base64String: String) -> String {
+        let data = Data(base64Encoded: base64String)!
+        return String(data: data, encoding: .utf8)!
+    }
     
     func decrypt(message base64String: String, hexKey: String) -> String {
         let base64Data = Data(base64Encoded: base64String)
@@ -76,7 +84,7 @@ class Crypto {
             setKey(forItem: item)
         }
         let keys = itemKeys(fromEncryptedKey: item.encItemKey!)
-        params["content"] = encrypt(message: message, key: keys["ek"]!)
+        params["content"] = "001" + encrypt(message: message, key: keys["ek"]!)
         params["enc_item_key"] = item.encItemKey!
         params["auth_hash"] = authHashString(encryptedContent: params["content"]!, authKey: keys["ak"]!)
         return params
@@ -115,7 +123,7 @@ class Crypto {
     func decryptItems(items: inout [JSON]){
         for index in 0..<items.count {
             var item = items[index]
-            if let enc_key = item["enc_item_key"].string {
+            if item["content"].string?.substring(to: 3) == "001", let enc_key = item["enc_item_key"].string {
                 let keys = itemKeys(fromEncryptedKey: enc_key)
                 let ek = keys["ek"]!
                 let ak = keys["ak"]!
@@ -133,10 +141,13 @@ class Crypto {
                     continue
                 }
                 
-                let decryptedContent = decrypt(message: item["content"].string!, hexKey: ek)
+                let contentToDecrypt = item["content"].string!.substring(from: 3)
+                let decryptedContent = decrypt(message: contentToDecrypt, hexKey: ek)
                 items[index]["content"] = JSON(decryptedContent)
-                
 //                print("Decrypted content \(decryptedContent) JSON body: \(item["content"].string)")
+            } else {
+                let contentToDecode = item["content"].string!.substring(from: 3)
+                items[index]["content"] = JSON(Crypto.sharedInstance.base64decode(base64String: contentToDecode))
             }
         }
         
@@ -177,6 +188,28 @@ extension String {
         }
         
         return data
+    }
+}
+
+extension String {
+    func index(from: Int) -> Index {
+        return self.index(startIndex, offsetBy: from)
+    }
+    
+    func substring(from: Int) -> String {
+        let fromIndex = index(from: from)
+        return substring(from: fromIndex)
+    }
+    
+    func substring(to: Int) -> String {
+        let toIndex = index(from: to)
+        return substring(to: toIndex)
+    }
+    
+    func substring(with r: Range<Int>) -> String {
+        let startIndex = index(from: r.lowerBound)
+        let endIndex = index(from: r.upperBound)
+        return substring(with: startIndex..<endIndex)
     }
 }
 

@@ -203,7 +203,7 @@ class ApiController {
         if(item.isPublic) {
             // send decrypted
             params["enc_item_key"] = nil
-            params["content"] = item.createContentJSONFromProperties().rawString()
+            params["content"] = "000" + Crypto.sharedInstance.base64(message: item.createContentJSONFromProperties().rawString()!)
         } else {
             // send encrypted
             let encryptedParams = Crypto.sharedInstance.encryptionParams(forItem: item)

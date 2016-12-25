@@ -36,6 +36,7 @@ class NotesViewController: UIViewController {
     var viewDidDisappear = false
     
     override func viewWillAppear(_ animated: Bool) {
+        refreshItems()
         if viewDidDisappear {
             viewDidDisappear = false
             ApiController.sharedInstance.saveDirtyItems { error in
