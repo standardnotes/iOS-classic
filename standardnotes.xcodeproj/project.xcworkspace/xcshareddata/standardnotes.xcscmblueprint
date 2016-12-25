@@ -12,11 +12,11 @@
   },
   "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "6614577D-AFD4-48D3-837E-693D8F3C5232",
   "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
-    "79E4DA54FAC41C8AFB3B666E164C71E775A27450" : "standardnotes-ios\/",
+    "79E4DA54FAC41C8AFB3B666E164C71E775A27450" : "ios\/",
     "DEDD58F0BAF28034A74179391A23AC2E0219CDC3" : "standardnotes\/vendor\/RNCryptor\/",
     "C3D8ED1CB28D809ADCE2C0DE74935E8A502ACD53" : "standardnotes\/vendor\/CryptoSwift\/",
-    "C861FC00CEE0F6A6BE81FCFF6785FAA78C58EBB3" : "standardnotes-ios\/vendor\/SwiftyJSON\/",
-    "67620B5EFA902936DF04070AF595B76AB0333747" : "standardnotes-ios\/vendor\/Alamofire\/"
+    "C861FC00CEE0F6A6BE81FCFF6785FAA78C58EBB3" : "ios\/vendor\/SwiftyJSON\/",
+    "67620B5EFA902936DF04070AF595B76AB0333747" : "ios\/vendor\/Alamofire\/"
   },
   "DVTSourceControlWorkspaceBlueprintNameKey" : "standardnotes",
   "DVTSourceControlWorkspaceBlueprintVersion" : 204,
