@@ -16,6 +16,9 @@ public class Item: NSManagedObject {
         if self.uuid == nil {
             self.uuid = UUID().uuidString
         }
+        
+        self.createdAt = Date()
+        self.updatedAt = Date()
     }
     
     func updateFromJSON(json: JSON) {
@@ -25,8 +28,26 @@ public class Item: NSManagedObject {
         self.presentationName = json["presentation_name"].string
         self.content = json["content"].string!
         self.url = json["presentation_url"].string
+        
+        self.createdAt = dateFromString(string: json["created_at"].string!)
+        self.updatedAt = dateFromString(string: json["updated_at"].string!)
 
         mapContentToLocalProperties(contentObject: contentObject)
+    }
+    
+    func dateFromString(string: String) -> Date {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        let date = dateFormatter.date(from: string)
+        return date!
+    }
+    
+    func humanReadableCreateDate() -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
+        dateFormatter.timeStyle = .short
+        let string = dateFormatter.string(from: self.createdAt)
+        return string
     }
     
     var contentObject: JSON {
@@ -35,6 +56,15 @@ public class Item: NSManagedObject {
     
     func createContentJSONFromProperties() -> JSON {
         return self.buildFullContentObject()
+    }
+    
+    func canDelete() -> Bool {
+        return true
+    }
+    
+    // called when sharing an item and related items should be synced as well
+    func markRelatedItemsAsDirty() {
+        // override
     }
     
     func mapContentToLocalProperties(contentObject: JSON) {

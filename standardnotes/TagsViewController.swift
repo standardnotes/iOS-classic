@@ -29,8 +29,8 @@ class TagsViewController: UIViewController {
     }
     
     func configureNavBar() {
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(donePressed))
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "New", style: .plain, target: self, action: #selector(newTagPressed))
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Dismiss", style: .plain, target: self, action: #selector(donePressed))
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New", style: .plain, target: self, action: #selector(newTagPressed))
     }
     
     func newTagPressed() {
@@ -94,6 +94,77 @@ class TagsViewController: UIViewController {
             selectedTags.addObjects(from: [tag])
         }
     }
+    
+    func presentActionSheetForTag(tag: Tag) {
+        let alertController = UIAlertController(title: tag.url, message: nil, preferredStyle: .actionSheet)
+        
+        let shareAction = UIAlertAction(title: "Share", style: .default, handler: {
+            alert -> Void in
+            ApiController.sharedInstance.shareItem(item: tag, completion: { (error) in
+                if error != nil {
+                    self.showAlert(title: "Oops", message: error!.localizedDescription)
+                } else {
+                    self.tableView.reloadData()
+                    self.presentActionSheetForTag(tag: tag)
+                }
+            })
+        })
+        
+        let openInSafariAction = UIAlertAction(title: "View In Safari", style: .default, handler: {
+            alert -> Void in
+            UIApplication.shared.open(URL(string: tag.url!)!, options: [:], completionHandler: nil)
+        })
+        
+        let unshareAction = UIAlertAction(title: "Unshare", style: .default, handler: {
+            alert -> Void in
+            ApiController.sharedInstance.unshareItem(item: tag, completion: { (error) in
+                if error != nil {
+                    self.showAlert(title: "Oops", message: error!.localizedDescription)
+                } else {
+                    self.tableView.reloadData()
+                    self.presentActionSheetForTag(tag: tag)
+                }
+            })
+        })
+        
+        let deleteAction = UIAlertAction(title: "Delete", style: .destructive, handler: {
+            alert -> Void in
+            if !tag.canDelete() {
+                self.showAlert(title: "Cannot Delete", message: "To delete this tag, first delete all the notes that belong to this tag.")
+            } else {
+                self.showDestructiveAlert(title: "Confirm Deletion", message: "Are you sure you want to delete this tag?", buttonString: "Delete", block: {
+                    self.deleteTag(tag: tag)
+                })
+            }
+        })
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: {
+            (action : UIAlertAction!) -> Void in
+            
+        })
+        
+        if tag.isPublic {
+            alertController.addAction(unshareAction)
+            alertController.addAction(openInSafariAction)
+        } else {
+            alertController.addAction(shareAction)
+        }
+        alertController.addAction(deleteAction)
+        alertController.addAction(cancelAction)
+        
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
+    func deleteTag(tag: Tag) {
+        ItemManager.sharedInstance.setItemToBeDeleted(item: tag)
+        ApiController.sharedInstance.saveDirtyItems { (error) in
+            if error == nil {
+                ItemManager.sharedInstance.removeItemFromCoreData(item: tag)
+            } else {
+                self.showAlert(title: "Oops", message: "There was an error deleting this tag. Please try again.")
+            }
+        }
+    }
 }
 
 
@@ -107,6 +178,9 @@ extension TagsViewController : UITableViewDelegate, UITableViewDataSource {
         cell.selectionStyle = .none
         cell.selectionStateChanged = {changedCell, status in
             self.setTagEnabled(tag: cell.tagObject, enabled: status)
+        }
+        cell.longPressHandler = { cell in
+            self.presentActionSheetForTag(tag: cell.tagObject)
         }
     }
     

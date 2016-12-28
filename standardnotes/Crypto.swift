@@ -11,7 +11,6 @@ import Foundation
 class Crypto {
     
     static let sharedInstance : Crypto = {
-        print("Creating Crypto instance.")
         return Crypto()
     }()
     
@@ -123,6 +122,11 @@ class Crypto {
     func decryptItems(items: inout [JSON]){
         for index in 0..<items.count {
             var item = items[index]
+            
+            if item["deleted"].boolValue == true {
+                continue
+            }
+            
             if item["content"].string?.substring(to: 3) == "001", let enc_key = item["enc_item_key"].string {
                 let keys = itemKeys(fromEncryptedKey: enc_key)
                 let ek = keys["ek"]!

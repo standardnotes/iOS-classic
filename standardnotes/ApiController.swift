@@ -9,6 +9,7 @@
 import Foundation
 import Alamofire
 import CoreData
+import UIKit
 
 class ApiController {
 
@@ -29,10 +30,6 @@ class ApiController {
         return _sharedInstance
     }()
     
-    func getCurrentUser(completion: @escaping (User) -> ()) {
-        
-    }
-    
     func getAuthParams(email: String, completion: @escaping (JSON?, Error?) -> ()) {
         let parameters: Parameters = [
             "email": email,
@@ -49,17 +46,15 @@ class ApiController {
     }
     
     var server: String {
-        return UserManager.sharedInstance.server
+        return UserManager.sharedInstance.server + "/api"
     }
     
     func createRegistrationAuthParams(forEmail email: String) -> [String : AnyObject] {
         let pwParams = Crypto.sharedInstance.defaultPasswordGenerationParams()
         let nonce = Crypto.sharedInstance.generateRandomHexKey(size: 256)
         let salt = Crypto.sharedInstance.sha1(message: email + "SN" + nonce);
-        print("\nRegistering with salt: \(salt)\n")
         return pwParams.merged(with: ["pw_salt" : salt, "pw_nonce" : nonce]) as [String : AnyObject]
     }
-    
     
     func register(email: String, password: String, completion: @escaping (Error?) -> ()) {
 
@@ -71,14 +66,7 @@ class ApiController {
         UserManager.sharedInstance.mk = mk
         UserManager.sharedInstance.save()
         
-        let parameters: Parameters = [
-            "user" : [
-                "email": email,
-                "password" : pw,
-            ].merged(with: authParams)
-        ]
-        
-        print("Registering with pw: \(pw)")
+        let parameters: Parameters = ["email": email, "password" : pw].merged(with: authParams)
         
         Alamofire.request("\(self.server)/auth", method: .post, parameters: parameters)
             .validate(statusCode: 200..<300)
@@ -106,7 +94,6 @@ class ApiController {
                 completion(error)
                 return
             }
-            
 
             let result = Crypto.sharedInstance.pbkdf2(hash: CCPBKDFAlgorithm(kCCPRFHmacAlgSHA512), password: password, salt: authParams!["pw_salt"].string!, keyByteCount: authParams!["pw_key_size"].int!/8, rounds: authParams!["pw_cost"].int!)!
             let pw = result.firstHalf()
@@ -114,13 +101,7 @@ class ApiController {
             UserManager.sharedInstance.mk = mk
             UserManager.sharedInstance.save()
             
-            let parameters: Parameters = [
-                "user" : [
-                    "email": email,
-                    "password" : pw,
-                    ]
-                ]
-            print("Signing in with pw: \(pw)")
+            let parameters: Parameters = ["email": email, "password" : pw]
             
             Alamofire.request("\(self.server)/auth/sign_in.json", method: .post, parameters: parameters)
                 .validate(statusCode: 200..<300)
@@ -161,6 +142,11 @@ class ApiController {
     }
     
     func saveDirtyItems(completion: @escaping (Error?) -> ()) {
+        if UserManager.sharedInstance.signedIn == false {
+            completion(nil)
+            return
+        }
+        
         let dirty = ItemManager.sharedInstance.fetchDirty()
         if dirty.count == 0 {
             completion(nil)
@@ -171,23 +157,23 @@ class ApiController {
             if error == nil {
                 ItemManager.sharedInstance.clearDirty(items: items!)
             }
-            print("Items after setting dirty = false: \(items)")
             completion(error)
         })
     }
     
     func saveItems(items: [Item], completion: @escaping ([Item]?, Error?) -> ()) {
-        let itemParams = items.map { (item) -> [String : String] in
+        let itemParams = items.map { (item) -> [String : Any] in
             return self.createParamsFromItem(item: item)
         }
-        print("Saving items: \(itemParams)")
-        Alamofire.request("\(self.server)/items", method: .post, parameters: ["items" : itemParams], headers: headers()).responseJSON { response in
+        
+        print("Saving items \(itemParams)")
+
+        Alamofire.request("\(self.server)/items", method: .post, parameters: ["items" : itemParams], encoding: JSONEncoding.default,  headers: headers()).responseJSON { response in
             if let error = response.result.error {
                 print("Error saving items: \(error)")
                 completion(nil, error)
             } else {
                 let json = JSON(data: response.data!)
-                print("\nSave items response: \(json)")
                 var jsonItems = json["items"].array!
                 let items = self.handleItemsResponse(responseItems: &jsonItems)
                 completion(items, nil)
@@ -195,15 +181,25 @@ class ApiController {
         }
     }
     
-    func createParamsFromItem(item: Item) -> [String : String] {
-        var params = [String : String]()
+    func createParamsFromItem(item: Item) -> [String : Any] {
+        var params = [String : Any]()
         params["content_type"] = item.contentType
         params["uuid"] = item.uuid
-        params["presentation_name"] = item.presentationName
+        
+        if item.presentationName != nil {
+            params["presentation_name"] = item.presentationName
+        } else {
+            params["presentation_name"] = NSNull()
+        }
+        
+        params["deleted"] = item.modelDeleted
+        
         if(item.isPublic) {
             // send decrypted
-            params["enc_item_key"] = nil
+            params["enc_item_key"] = NSNull()
+            params["auth_hash"] = NSNull()
             params["content"] = "000" + Crypto.sharedInstance.base64(message: item.createContentJSONFromProperties().rawString()!)
+            
         } else {
             // send encrypted
             let encryptedParams = Crypto.sharedInstance.encryptionParams(forItem: item)
@@ -222,6 +218,7 @@ class ApiController {
     func shareItem(item: Item, completion: @escaping (Error?) -> ()) {
         item.presentationName = "_auto_"
         item.dirty = true
+        item.markRelatedItemsAsDirty()
         saveDirtyItems { (error) in
             completion(error)
         }
@@ -230,11 +227,29 @@ class ApiController {
     func unshareItem(item: Item, completion: @escaping (Error?) -> ()) {
         item.presentationName = nil
         item.dirty = true
+        item.markRelatedItemsAsDirty()
         saveDirtyItems { (error) in
             completion(error)
         }
     }
     
+    func deleteItem(item: Item, completion: @escaping ((Error?) -> ())) {
+        Alamofire.request("\(self.server)/items/\(item.uuid)", method: .delete, headers: headers()).responseJSON { response in
+            if let error = response.result.error {
+                print("Error deleting item: \(error)")
+            }
+            completion(response.result.error)
+        }
+    }
+    
+}
+
+extension UIViewController {
+    func saveDirty() {
+        ApiController.sharedInstance.saveDirtyItems { error in
+            
+        }
+    }
 }
 
 extension Dictionary {
@@ -248,4 +263,9 @@ extension Dictionary {
         dict.merge(with: dictionary)
         return dict
     }
+}
+
+func delay(_ delay:Double, closure:@escaping ()->()) {
+    let when = DispatchTime.now() + delay
+    DispatchQueue.main.asyncAfter(deadline: when, execute: closure)
 }

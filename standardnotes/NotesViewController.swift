@@ -15,21 +15,39 @@ class NotesViewController: UIViewController {
     
     var resultsController: NSFetchedResultsController<Note>!
     var selectedTags = [Tag]()
+    var refreshControl: UIRefreshControl!
    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureTableView()
         configureNavBar()
         reloadResults()
+        
+        NotificationCenter.default.addObserver(forName: NSNotification.Name.UIApplicationWillEnterForeground, object: nil, queue: OperationQueue.main) { (notification) in
+            self.refreshItems()
+        }
+        
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: UserManager.LogoutNotification), object: nil, queue: OperationQueue.main) { (notification) in
+            self.reloadResults()
+        }
     }
     
     func configureTableView() {
         self.tableView.rowHeight = UITableViewAutomaticDimension
-        self.tableView.estimatedRowHeight = 70
+        self.tableView.estimatedRowHeight = 90
+     
+        refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
+        tableView.addSubview(refreshControl)
+    }
+    
+    func refresh() {
+        refreshItems()
     }
     
     func configureNavBar() {
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Tags", style: .plain, target: self, action: #selector(tagsPressed))
+        let tagsTitle = selectedTags.count > 0 ? "Tags (\(selectedTags.count))" : "Tags"
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: tagsTitle, style: .plain, target: self, action: #selector(tagsPressed))
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New", style: .plain, target: self, action: #selector(newPressed))
     }
     
@@ -39,9 +57,7 @@ class NotesViewController: UIViewController {
         refreshItems()
         if viewDidDisappear {
             viewDidDisappear = false
-            ApiController.sharedInstance.saveDirtyItems { error in
-                
-            }
+                self.saveDirty()
         }
     }
     
@@ -50,7 +66,12 @@ class NotesViewController: UIViewController {
     }
     
     func refreshItems() {
+        if !UserManager.sharedInstance.signedIn {
+            return
+        }
+        print("refresh")
         ApiController.sharedInstance.refreshItems { (items) in
+            self.refreshControl.endRefreshing()
         }
     }
     
@@ -60,6 +81,7 @@ class NotesViewController: UIViewController {
         tags.selectionCompletion = { tags in
             self.selectedTags = tags
             self.reloadResults()
+            self.configureNavBar()
             print("Reloading results after tags selecteion: \(tags)")
         }
         
@@ -90,7 +112,7 @@ class NotesViewController: UIViewController {
             let tagPredicate = NSCompoundPredicate(orPredicateWithSubpredicates: predicates)
             fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [fetchRequest.predicate!, tagPredicate])
         }
-        let sort = NSSortDescriptor(key: "uuid", ascending: true)
+        let sort = NSSortDescriptor(key: "createdAt", ascending: false)
         fetchRequest.sortDescriptors = [sort]
         resultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: AppDelegate.sharedContext, sectionNameKeyPath: nil, cacheName: nil)
     
@@ -114,6 +136,7 @@ class NotesViewController: UIViewController {
                     self.showAlert(title: "Oops", message: error!.localizedDescription)
                 } else {
                     self.tableView.reloadData()
+                    self.presentActionSheetForNote(note: note)
                 }
             })
         })
@@ -130,7 +153,15 @@ class NotesViewController: UIViewController {
                     self.showAlert(title: "Oops", message: error!.localizedDescription)
                 } else {
                     self.tableView.reloadData()
+                    self.presentActionSheetForNote(note: note)
                 }
+            })
+        })
+        
+        let deleteAction = UIAlertAction(title: "Delete", style: .destructive, handler: {
+            alert -> Void in
+            self.showDestructiveAlert(title: "Confirm Deletion", message: "Are you sure you want to delete this note?", buttonString: "Delete", block: { 
+                self.deleteNote(note: note)
             })
         })
         
@@ -139,15 +170,27 @@ class NotesViewController: UIViewController {
             
         })
         
-        if note.isPublic {
+        if note.isSharedIndividually {
             alertController.addAction(unshareAction)
             alertController.addAction(openInSafariAction)
         } else {
             alertController.addAction(shareAction)
         }
+        alertController.addAction(deleteAction)
         alertController.addAction(cancelAction)
         
         self.present(alertController, animated: true, completion: nil)
+    }
+    
+    func deleteNote(note: Note) {
+        ItemManager.sharedInstance.setItemToBeDeleted(item: note)
+        ApiController.sharedInstance.saveDirtyItems { (error) in
+            if error == nil {
+                ItemManager.sharedInstance.removeItemFromCoreData(item: note)
+            } else {
+                self.showAlert(title: "Oops", message: "There was an error deleting your note. Please try again.")
+            }
+        }
     }
 }
 
@@ -157,6 +200,7 @@ extension NotesViewController : UITableViewDelegate, UITableViewDataSource {
         let selectedObject = resultsController.object(at: indexPath as IndexPath) as Note
         cell.titleLabel?.text = selectedObject.safeTitle()
         cell.contentLabel?.text = selectedObject.safeText()
+        cell.dateLabel?.text = selectedObject.humanReadableCreateDate()
         cell.note = selectedObject
         cell.longPressHandler = { cell in
             self.presentActionSheetForNote(note: cell.note)

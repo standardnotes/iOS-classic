@@ -70,9 +70,25 @@ class AccountViewController: UITableViewController {
     }
     
     func signOut() {
-        UserManager.sharedInstance.clear()
-        reloadData()
+        
+        func performSignout() {
+            UserManager.sharedInstance.clear()
+            ItemManager.sharedInstance.signOut()
+            reloadData()
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: UserManager.LogoutNotification), object: nil)
+        }
+        
+        let dirtyItems = ItemManager.sharedInstance.fetchDirty()
+        if dirtyItems.count > 0 {
+            self.showConfirmationAlert(title: "Unsaved Changes", message: "You have unsaved changes. Are you sure you want to log out and remove all data from this device?", confirmString: "Log Out", confirmBlock: {
+                performSignout()
+            })
+        } else {
+            performSignout()
+        }
     }
+    
+
     
     var email: String? {
         return UserManager.sharedInstance.email

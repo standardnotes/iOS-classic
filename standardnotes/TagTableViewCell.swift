@@ -15,10 +15,25 @@ class TagTableViewCell: UITableViewCell {
     var tagObject: Tag!
     var selectionStateChanged: ((TagTableViewCell, Bool) -> ())!
     
+    var longPressHandler: ((TagTableViewCell) -> ())!
+    var longPress: UILongPressGestureRecognizer!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
+        configureLongPress()
     }
-
+    
+    func configureLongPress() {
+        longPress = UILongPressGestureRecognizer(target: self, action: #selector(longPressStateDidChange(gesture:)))
+        addGestureRecognizer(longPress)
+    }
+    
+    func longPressStateDidChange(gesture: UIGestureRecognizer) {
+        if gesture.state == .began {
+            longPressHandler(self)
+        }
+    }
+    
     @IBAction func switchValueChanged(_ sender: UISwitch) {
         self.selectionStateChanged(self, sender.isOn)
     }

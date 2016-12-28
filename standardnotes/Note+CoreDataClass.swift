@@ -23,7 +23,6 @@ public class Note: Item {
         self.contentType = "Note"
     }
 
-    
     override func structureParams() -> [String : Any] {
         return [
             "title" : safeTitle(),
@@ -41,7 +40,6 @@ public class Note: Item {
     
     override func addItemAsRelationship(item: Item) {
         if item.contentType == "Tag" {
-            print("Adding tag \(item) to note \(self)")
             self.addToTags(item as! Tag)
         }
         super.addItemAsRelationship(item: item)
@@ -59,9 +57,30 @@ public class Note: Item {
         self.addToTags(NSSet(array: tags))
     }
     
+    override func markRelatedItemsAsDirty() {
+        // noop - if a note is shared, tags arent affected
+    }
+    
     override func clearReferences() {
         self.removeFromTags(self.tags!)
         super.clearReferences()
+    }
+    
+    func hasOnePublicTag() -> Bool {
+        for tag in self.tags!.allObjects as! [Tag] {
+            if tag.isPublic {
+                return true
+            }
+        }
+        return false
+    }
+    
+    override var isPublic: Bool {
+        return super.isPublic || self.hasOnePublicTag()
+    }
+    
+    var isSharedIndividually: Bool {
+        return self.presentationName != nil
     }
     
     func safeTitle() -> String {

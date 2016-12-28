@@ -17,8 +17,6 @@
 		B82B6E151E08AC230025C3EC /* Item+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = B82B6E131E08AC230025C3EC /* Item+CoreDataClass.swift */; };
 		B82B6E161E08AC230025C3EC /* Item+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = B82B6E141E08AC230025C3EC /* Item+CoreDataProperties.swift */; };
 		B82B6E181E08AC8C0025C3EC /* ApiController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B82B6E171E08AC8C0025C3EC /* ApiController.swift */; };
-		B82B6E1C1E08B8730025C3EC /* User+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = B82B6E1A1E08B8730025C3EC /* User+CoreDataClass.swift */; };
-		B82B6E1D1E08B8730025C3EC /* User+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = B82B6E1B1E08B8730025C3EC /* User+CoreDataProperties.swift */; };
 		B82B6E391E08BC550025C3EC /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B82B6E2C1E08BC1D0025C3EC /* Alamofire.framework */; };
 		B82B6E3A1E08BC550025C3EC /* Alamofire.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B82B6E2C1E08BC1D0025C3EC /* Alamofire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B872EC791E08C38500CC7656 /* SwiftyJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = B872EC781E08C38500CC7656 /* SwiftyJSON.swift */; };
@@ -124,8 +122,6 @@
 		B82B6E131E08AC230025C3EC /* Item+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Item+CoreDataClass.swift"; sourceTree = "<group>"; };
 		B82B6E141E08AC230025C3EC /* Item+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Item+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		B82B6E171E08AC8C0025C3EC /* ApiController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApiController.swift; sourceTree = "<group>"; };
-		B82B6E1A1E08B8730025C3EC /* User+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "User+CoreDataClass.swift"; sourceTree = "<group>"; };
-		B82B6E1B1E08B8730025C3EC /* User+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "User+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		B82B6E201E08BC1D0025C3EC /* Alamofire.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Alamofire.xcodeproj; path = vendor/Alamofire/Alamofire.xcodeproj; sourceTree = SOURCE_ROOT; };
 		B872EC781E08C38500CC7656 /* SwiftyJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftyJSON.swift; path = vendor/SwiftyJSON/Source/SwiftyJSON.swift; sourceTree = SOURCE_ROOT; };
 		B872EC871E08D00400CC7656 /* standardnotes-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "standardnotes-Bridging-Header.h"; sourceTree = SOURCE_ROOT; };
@@ -158,14 +154,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B80140921E12FFA00046082C /* Compose */ = {
+			isa = PBXGroup;
+			children = (
+				B809F2B71E0B5164007D5700 /* ComposeViewController.swift */,
+			);
+			name = Compose;
+			sourceTree = "<group>";
+		};
 		B809F2B91E0B5173007D5700 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
 				B82B6DFE1E08AA660025C3EC /* Main.storyboard */,
 				B89178E51E0DBDC800163EA7 /* Notes */,
 				B89178E61E0DC80600163EA7 /* Tags */,
+				B80140921E12FFA00046082C /* Compose */,
 				B89178E11E0D86D500163EA7 /* TabBarViewController.swift */,
-				B809F2B71E0B5164007D5700 /* ComposeViewController.swift */,
 				B89178DD1E0D7D8300163EA7 /* AccountViewController.swift */,
 			);
 			name = "View Controllers";
@@ -211,8 +215,6 @@
 				B878C4CB1E0A5116002A876F /* Note+CoreDataProperties.swift */,
 				B89178CC1E0C9A4D00163EA7 /* Tag+CoreDataClass.swift */,
 				B89178D91E0C9B9D00163EA7 /* Tag+CoreDataProperties.swift */,
-				B82B6E1A1E08B8730025C3EC /* User+CoreDataClass.swift */,
-				B82B6E1B1E08B8730025C3EC /* User+CoreDataProperties.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -428,7 +430,6 @@
 				B82B6DFD1E08AA660025C3EC /* NotesViewController.swift in Sources */,
 				B89178DE1E0D7D8300163EA7 /* AccountViewController.swift in Sources */,
 				B89178DA1E0C9B9D00163EA7 /* Tag+CoreDataProperties.swift in Sources */,
-				B82B6E1D1E08B8730025C3EC /* User+CoreDataProperties.swift in Sources */,
 				B89178E81E0DC81500163EA7 /* TagTableViewCell.swift in Sources */,
 				B89178CE1E0C9A4D00163EA7 /* Tag+CoreDataClass.swift in Sources */,
 				B82B6E181E08AC8C0025C3EC /* ApiController.swift in Sources */,
@@ -445,7 +446,6 @@
 				B878C4CC1E0A5116002A876F /* Note+CoreDataClass.swift in Sources */,
 				B878C4A01E09A1DD002A876F /* ItemManager.swift in Sources */,
 				B89178DC1E0CA96E00163EA7 /* TagsViewController.swift in Sources */,
-				B82B6E1C1E08B8730025C3EC /* User+CoreDataClass.swift in Sources */,
 				B89178E01E0D84C200163EA7 /* UserManager.swift in Sources */,
 				B878C4B21E09ADF6002A876F /* Crypto.swift in Sources */,
 			);

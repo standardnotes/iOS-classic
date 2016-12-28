@@ -42,9 +42,19 @@ public class Tag: Item {
         }
     }
     
+    override func markRelatedItemsAsDirty() {
+        for note in self.notes!.allObjects as! [Note] {
+            note.dirty = true
+        }
+    }
+    
     override func clearReferences() {
         self.removeFromNotes(self.notes!)
         super.clearReferences()
+    }
+    
+    override func canDelete() -> Bool {
+        return self.notes!.count == 0
     }
     
     func safeTitle() -> String {

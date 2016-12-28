@@ -24,4 +24,8 @@ extension Item {
     @NSManaged public var presentationName: String?
     @NSManaged public var dirty: Bool
     @NSManaged public var draft: Bool
+    @NSManaged public var modelDeleted: Bool
+    
+    @NSManaged public var createdAt: Date
+    @NSManaged public var updatedAt: Date
 }

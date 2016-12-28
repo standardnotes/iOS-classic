@@ -3,10 +3,13 @@
     <entity name="Item" representedClassName=".Item" syncable="YES">
         <attribute name="content" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="contentType" attributeType="String" syncable="YES"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" defaultDateTimeInterval="504585960" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="dirty" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="draft" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="encItemKey" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="modelDeleted" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="presentationName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="uuid" attributeType="String" syncable="YES"/>
         <compoundIndexes>
@@ -24,14 +27,9 @@
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="notes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Note" inverseName="tags" inverseEntity="Note" syncable="YES"/>
     </entity>
-    <entity name="User" representedClassName=".User" syncable="YES">
-        <attribute name="email" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="uuid" optional="YES" attributeType="String" syncable="YES"/>
-    </entity>
     <elements>
-        <element name="Item" positionX="-63" positionY="-18" width="128" height="165"/>
+        <element name="Item" positionX="-63" positionY="-18" width="128" height="210"/>
         <element name="Note" positionX="-54" positionY="18" width="128" height="90"/>
-        <element name="User" positionX="-45" positionY="18" width="128" height="75"/>
         <element name="Tag" positionX="-54" positionY="27" width="128" height="75"/>
     </elements>
 </model>

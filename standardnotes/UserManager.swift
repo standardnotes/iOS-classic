@@ -10,6 +10,8 @@ import Foundation
 
 class UserManager {
     
+    static let LogoutNotification = "LogoutNotification"
+    
     static let sharedInstance : UserManager = {
         return UserManager()
     }()
@@ -20,6 +22,10 @@ class UserManager {
         server = UserDefaults.standard.object(forKey: "server") as! String?
         jwt = UserDefaults.standard.object(forKey: "jwt") as! String?
         mk = UserDefaults.standard.object(forKey: "mk") as! String?
+        
+        if server == nil {
+            server = "https://n3.standardnotes.org"
+        }
     }
     
     var email: String!
@@ -27,7 +33,6 @@ class UserManager {
     var server: String!
     var mk: String!
     var jwt: String!
-
     
     func save() {
         UserDefaults.standard.set(email, forKey: "email")

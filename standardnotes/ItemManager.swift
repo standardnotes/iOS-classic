@@ -30,6 +30,13 @@ class ItemManager {
     func mapResponseItemsToLocalItems(responseItems: [JSON]) -> [Item] {
         var items: [Item] = []
         for responseItem in responseItems {
+            if responseItem["deleted"].boolValue == true {
+                let item = findItem(uuid: responseItem["uuid"].string!, contentType: responseItem["content_type"].string!)
+                if item != nil {
+                    context.delete(item!)
+                }
+                continue
+            }
             let item = findOrCreateItem(uuid: responseItem["uuid"].string!, contentType: responseItem["content_type"].string!)
             item.updateFromJSON(json: responseItem)
             resolveReferences(forItem: item)
@@ -132,6 +139,31 @@ class ItemManager {
                 fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
         }
+    }
+    
+    func setItemToBeDeleted(item: Item) {
+        item.modelDeleted = true
+        item.dirty = true
+    }
+    
+    func removeItemFromCoreData(item: Item) {
+        context.delete(item)
+        saveContext()
+    }
+    
+    func deleteAllItemsForEntityName(name: String) {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: name)
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+        let coordinator = AppDelegate.sharedInstance.persistentContainer.persistentStoreCoordinator
+        do {
+            try coordinator.execute(deleteRequest, with: context)
+        } catch let error as NSError {
+            print("Error deleting items: \(error)")
+        }
+    }
+    
+    func signOut() {
+        deleteAllItemsForEntityName(name: "Item")
     }
 
 }
