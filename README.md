@@ -1,4 +1,4 @@
-### Standard Notes for iOS
+# Standard Notes for iOS
 
 This app will be available for download from the App Store some time in January, 2017.
 
