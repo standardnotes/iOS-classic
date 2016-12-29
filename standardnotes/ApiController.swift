@@ -166,7 +166,7 @@ class ApiController {
             return self.createParamsFromItem(item: item)
         }
         
-        print("Saving items \(itemParams)")
+//        print("Saving items \(itemParams)")
 
         Alamofire.request("\(self.server)/items", method: .post, parameters: ["items" : itemParams], encoding: JSONEncoding.default,  headers: headers()).responseJSON { response in
             if let error = response.result.error {

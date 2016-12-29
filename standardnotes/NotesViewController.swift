@@ -258,7 +258,9 @@ extension NotesViewController : NSFetchedResultsControllerDelegate {
             tableView.deleteRows(at: [indexPath! as IndexPath], with
                 : .fade)
         case .update:
-            configureCell(cell: tableView.cellForRow(at: indexPath! as IndexPath) as! NoteTableViewCell, indexPath: indexPath! as NSIndexPath)
+            if let cell = tableView.cellForRow(at: indexPath! as IndexPath) as? NoteTableViewCell {
+                configureCell(cell: cell, indexPath: indexPath! as NSIndexPath)
+            }
         case .move:
             tableView.moveRow(at: indexPath! as IndexPath, to: newIndexPath! as IndexPath)
         }
