@@ -12,4 +12,7 @@ cd iOS
 git submodule update --init
 ```
 
-![app](https://raw.githubusercontent.com/standardnotes/iOS/master/screenshots/Simulator%20Screen%20Shot%20Dec%2028%2C%202016%2C%207.08.58%20PM.png)
+![app](https://github.com/standardnotes/iOS/blob/master/screenshots/small/1.png?raw=true)
+![app](https://github.com/standardnotes/iOS/blob/master/screenshots/small/2.png?raw=true)
+![app](https://github.com/standardnotes/iOS/blob/master/screenshots/small/3.png?raw=true)
+![app](https://github.com/standardnotes/iOS/blob/master/screenshots/small/4.png?raw=true)
