@@ -157,7 +157,7 @@ class TagsViewController: UIViewController {
     
     func deleteTag(tag: Tag) {
         ItemManager.sharedInstance.setItemToBeDeleted(item: tag)
-        ApiController.sharedInstance.saveDirtyItems { (error) in
+        ApiController.sharedInstance.sync { (error) in
             if error == nil {
                 ItemManager.sharedInstance.removeItemFromCoreData(item: tag)
             } else {

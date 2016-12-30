@@ -19,7 +19,7 @@ class ApiController {
     
     init() {
         NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: ApiController.DirtyChangeMadeNotification), object: nil, queue: OperationQueue.main) { (notification) in
-            self.saveDirtyItems { error in
+            self.sync { error in
                 
             }
         }
@@ -78,14 +78,9 @@ class ApiController {
             let json = JSON(data: response.data!)
             UserManager.sharedInstance.jwt = json["token"].string!
             UserManager.sharedInstance.save()
-            if var jsonItems = json["items"].array {
-                let _ = self.handleItemsResponse(responseItems: &jsonItems)
-            }
             completion(nil)
         }
-        
     }
-    
     
     func signInUser(email: String, password: String, completion: @escaping (Error?) -> ()) {
         getAuthParams(email: email) { (authParams, error) in
@@ -113,8 +108,6 @@ class ApiController {
                 let json = JSON(data: response.data!)
                 UserManager.sharedInstance.jwt = json["token"].string!
                 UserManager.sharedInstance.save()
-                var jsonItems = json["items"].array!
-                let _ = self.handleItemsResponse(responseItems: &jsonItems)
                 completion(nil)
             }
         }
@@ -127,58 +120,57 @@ class ApiController {
         return headers
     }
     
-    func refreshItems(completion: @escaping ([Item]) -> ()) {
-        Alamofire.request("\(self.server)/items", headers: headers()).responseJSON { response in
-            if(response.result.error != nil) {
-                print("Error \(response.result.error)")
-            } else {
-                let json = JSON(data: response.data!)
-//                print("Refresh items response: \(response)")
-                var jsonItems = json["items"].array!
-                let items = self.handleItemsResponse(responseItems: &jsonItems)
-                completion(items)
+    var _syncToken: String?
+    var syncToken: String? {
+        get {
+            if _syncToken == nil {
+                _syncToken = UserDefaults.standard.object(forKey: "syncToken") as! String?
             }
+            return _syncToken
+        }
+        
+        set {
+            _syncToken = newValue
+            UserDefaults.standard.set(newValue, forKey: "syncToken")
         }
     }
     
-    func saveDirtyItems(completion: @escaping (Error?) -> ()) {
+    func sync(completion: @escaping (Error?) -> ()) {
         if UserManager.sharedInstance.signedIn == false {
             completion(nil)
             return
         }
         
         let dirty = ItemManager.sharedInstance.fetchDirty()
-        if dirty.count == 0 {
-            completion(nil)
-            return
-        }
         
-        saveItems(items: dirty, completion: { (items, error) in
-            if error == nil {
-                ItemManager.sharedInstance.clearDirty(items: items!)
-            }
-            completion(error)
-        })
-    }
-    
-    func saveItems(items: [Item], completion: @escaping ([Item]?, Error?) -> ()) {
-        let itemParams = items.map { (item) -> [String : Any] in
+        let itemParams = dirty.map { (item) -> [String : Any] in
             return self.createParamsFromItem(item: item)
         }
         
-//        print("Saving items \(itemParams)")
-
-        Alamofire.request("\(self.server)/items", method: .post, parameters: ["items" : itemParams], encoding: JSONEncoding.default,  headers: headers()).responseJSON { response in
+        var params = ["items" : itemParams] as [String : Any]
+        if(syncToken != nil) {
+            params["sync_token"] = syncToken!
+        }
+        
+        Alamofire.request("\(self.server)/items/sync", method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers())
+        .validate(statusCode: 200..<300)
+        .responseJSON { response in
             if let error = response.result.error {
                 print("Error saving items: \(error)")
-                completion(nil, error)
+                completion(error)
             } else {
+                ItemManager.sharedInstance.clearDirty(items: dirty)
                 let json = JSON(data: response.data!)
-                var jsonItems = json["items"].array!
-                let items = self.handleItemsResponse(responseItems: &jsonItems)
-                completion(items, nil)
+                self.syncToken = json["sync_token"].string!
+                
+                // merge retreived items completely
+                let _ = self.handleItemsResponse(responseItems: json["retrieved_items"].array!, omitFields: nil)
+                // merge only metadata for saved items
+                let _ = self.handleItemsResponse(responseItems: json["saved_items"].array!, omitFields: ["content", "enc_item_key", "auth_hash"])
+                completion(nil)
             }
         }
+        
     }
     
     func createParamsFromItem(item: Item) -> [String : Any] {
@@ -208,9 +200,10 @@ class ApiController {
         return params
     }
     
-    func handleItemsResponse(responseItems: inout [JSON]) -> [Item] {
-        Crypto.sharedInstance.decryptItems(items: &responseItems)
-        let items = ItemManager.sharedInstance.mapResponseItemsToLocalItems(responseItems: responseItems)
+    func handleItemsResponse(responseItems: [JSON], omitFields: [String]?) -> [Item] {
+        var _responseItems = responseItems
+        Crypto.sharedInstance.decryptItems(items: &_responseItems)
+        let items = ItemManager.sharedInstance.mapResponseItemsToLocalItems(responseItems: _responseItems, omitFields: omitFields)
         return items
     }
     
@@ -219,7 +212,7 @@ class ApiController {
         item.presentationName = "_auto_"
         item.dirty = true
         item.markRelatedItemsAsDirty()
-        saveDirtyItems { (error) in
+        sync { (error) in
             completion(error)
         }
     }
@@ -228,7 +221,7 @@ class ApiController {
         item.presentationName = nil
         item.dirty = true
         item.markRelatedItemsAsDirty()
-        saveDirtyItems { (error) in
+        sync { (error) in
             completion(error)
         }
     }
@@ -245,8 +238,8 @@ class ApiController {
 }
 
 extension UIViewController {
-    func saveDirty() {
-        ApiController.sharedInstance.saveDirtyItems { error in
+    func sync() {
+        ApiController.sharedInstance.sync { error in
             
         }
     }

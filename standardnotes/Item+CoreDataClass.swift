@@ -24,15 +24,20 @@ public class Item: NSManagedObject {
     func updateFromJSON(json: JSON) {
         self.uuid = json["uuid"].string!
         self.contentType = json["content_type"].string!
-        self.encItemKey = json["enc_item_key"].string
         self.presentationName = json["presentation_name"].string
-        self.content = json["content"].string!
+
+        if json["enc_item_key"] != JSON.null {
+            self.encItemKey = json["enc_item_key"].string
+        }
         self.url = json["presentation_url"].string
         
         self.createdAt = dateFromString(string: json["created_at"].string!)
         self.updatedAt = dateFromString(string: json["updated_at"].string!)
 
-        mapContentToLocalProperties(contentObject: contentObject)
+        if json["content"] != JSON.null {
+            self.content = json["content"].string!
+            mapContentToLocalProperties(contentObject: contentObject)
+        }
     }
     
     func dateFromString(string: String) -> Date {

@@ -57,7 +57,7 @@ class NotesViewController: UIViewController {
         refreshItems()
         if viewDidDisappear {
             viewDidDisappear = false
-                self.saveDirty()
+                self.sync()
         }
     }
     
@@ -69,8 +69,8 @@ class NotesViewController: UIViewController {
         if !UserManager.sharedInstance.signedIn {
             return
         }
-        print("refresh")
-        ApiController.sharedInstance.refreshItems { (items) in
+        
+        ApiController.sharedInstance.sync { (error) in
             self.refreshControl.endRefreshing()
         }
     }
@@ -184,7 +184,7 @@ class NotesViewController: UIViewController {
     
     func deleteNote(note: Note) {
         ItemManager.sharedInstance.setItemToBeDeleted(item: note)
-        ApiController.sharedInstance.saveDirtyItems { (error) in
+        ApiController.sharedInstance.sync { (error) in
             if error == nil {
                 ItemManager.sharedInstance.removeItemFromCoreData(item: note)
             } else {

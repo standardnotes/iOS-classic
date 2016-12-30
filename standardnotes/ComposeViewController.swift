@@ -114,7 +114,7 @@ class ComposeViewController: UIViewController {
         self.note.text = self.textView.text
         self.note.draft = false
         self.note.dirty = true
-        ApiController.sharedInstance.saveDirtyItems { error in
+        ApiController.sharedInstance.sync { error in
             if error == nil {
                 delay(0.2, closure: {
                     self.saving = false

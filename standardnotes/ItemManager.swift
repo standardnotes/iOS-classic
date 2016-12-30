@@ -27,9 +27,9 @@ class ItemManager {
         _sharedInstance = ItemManager(context: context)
     }
     
-    func mapResponseItemsToLocalItems(responseItems: [JSON]) -> [Item] {
+    func mapResponseItemsToLocalItems(responseItems: [JSON], omitFields: [String]?) -> [Item] {
         var items: [Item] = []
-        for responseItem in responseItems {
+        for var responseItem in responseItems {
             if responseItem["deleted"].boolValue == true {
                 let item = findItem(uuid: responseItem["uuid"].string!, contentType: responseItem["content_type"].string!)
                 if item != nil {
@@ -38,8 +38,15 @@ class ItemManager {
                 continue
             }
             let item = findOrCreateItem(uuid: responseItem["uuid"].string!, contentType: responseItem["content_type"].string!)
+            if omitFields != nil {
+                for omitField in omitFields! {
+                    responseItem[omitField] = JSON.null
+                }
+            }
             item.updateFromJSON(json: responseItem)
-            resolveReferences(forItem: item)
+            if responseItem["content"] != JSON.null {
+                resolveReferences(forItem: item)
+            }
             items.append(item)
         }
         self.saveContext()
