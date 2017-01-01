@@ -7,8 +7,9 @@
 //
 
 import UIKit
+import MessageUI
 
-class AccountViewController: UITableViewController {
+class AccountViewController: UITableViewController, MFMailComposeViewControllerDelegate {
     
     @IBOutlet weak var signInButton: UIButton!
     @IBOutlet weak var registerButton: UIButton!
@@ -16,6 +17,7 @@ class AccountViewController: UITableViewController {
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var signOutButton: UIButton!
+    @IBOutlet weak var exportButton: UIButton!
     
     var accountStatusChanged: ((Bool) -> ())!
    
@@ -42,10 +44,12 @@ class AccountViewController: UITableViewController {
             self.signInButton.isEnabled = false
             self.registerButton.isEnabled = false
             self.signOutButton.isEnabled = true
+            self.exportButton.isEnabled = true
         } else {
             self.signInButton.isEnabled = true
             self.registerButton.isEnabled = true
             self.signOutButton.isEnabled = false
+            self.exportButton.isEnabled = false
         }
 
         
@@ -116,6 +120,26 @@ class AccountViewController: UITableViewController {
         }
         
         register()
+    }
+    
+    @IBAction func exportDataPressed(_ sender: Any) {
+        if( MFMailComposeViewController.canSendMail() ) {
+            let mailComposer = MFMailComposeViewController()
+            mailComposer.mailComposeDelegate = self
+            mailComposer.setToRecipients(["me@bitar.io"])
+            mailComposer.setSubject("Standard Notes Data Backup - \(Date())")
+            mailComposer.setMessageBody("Note: this data is unencrypted and should be stored with care.", isHTML: false)
+            let data = ItemManager.sharedInstance.itemsExportJSONData()
+            mailComposer.addAttachmentData(data, mimeType: "application/json", fileName: "notes")
+            self.present(mailComposer, animated: true, completion: nil)
+        } else {
+            print("Cant sent mail")
+            self.showAlert(title: "Oops", message: "Your device cannot send email.")
+        }
+    }
+    
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        self.dismiss(animated: true, completion: nil)
     }
     
     func register() {

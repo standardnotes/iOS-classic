@@ -45,7 +45,6 @@ class UserManager {
     }
     
     func persist() {
-        //        print("Saving \(email), \(password), \(server), \(jwt), \(mk)")
         UserDefaults.standard.synchronize()
     }
     
@@ -56,7 +55,6 @@ class UserManager {
     func clear() {
         UserDefaults.standard.removeObject(forKey: "email")
         UserDefaults.standard.removeObject(forKey: "password")
-        UserDefaults.standard.removeObject(forKey: "server")
         UserDefaults.standard.removeObject(forKey: "jwt")
         UserDefaults.standard.removeObject(forKey: "mk")
         
@@ -64,7 +62,6 @@ class UserManager {
         self.mk = nil
         self.jwt = nil
         self.password = nil
-        self.server = nil
         
         persist()
     }

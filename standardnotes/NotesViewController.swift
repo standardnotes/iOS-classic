@@ -82,7 +82,6 @@ class NotesViewController: UIViewController {
             self.selectedTags = tags
             self.reloadResults()
             self.configureNavBar()
-            print("Reloading results after tags selecteion: \(tags)")
         }
         
         let navController = UINavigationController(rootViewController: tags)

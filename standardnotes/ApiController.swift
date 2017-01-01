@@ -23,6 +23,10 @@ class ApiController {
                 
             }
         }
+        
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: UserManager.LogoutNotification), object: nil, queue: OperationQueue.main) { (notification) in
+            self.syncToken = nil
+        }
     }
     
     static let sharedInstance : ApiController = {
@@ -234,7 +238,6 @@ class ApiController {
             completion(response.result.error)
         }
     }
-    
 }
 
 extension UIViewController {
