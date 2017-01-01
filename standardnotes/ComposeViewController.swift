@@ -103,6 +103,8 @@ class ComposeViewController: UIViewController {
 
     func dismissPressed(_ sender: Any) {
         AppDelegate.sharedInstance.saveContext()
+        self.textView.resignFirstResponder()
+        self.titleTextField.resignFirstResponder()
         self.dismiss(animated: true, completion: nil)
     }
    
