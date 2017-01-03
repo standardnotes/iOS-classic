@@ -133,12 +133,6 @@ class ComposeViewController: UIViewController {
         beginSaveTimer()
     }
     
-//    func updateTitleFromText() {
-//        // get up to 3 words
-//        let comps = self.textView.text.components(separatedBy: " ")
-//        let title = comps[0...3].joined(separator: " ")
-//        self.titleTextField.text = title
-//    }
 }
 
 extension ComposeViewController : UITextViewDelegate {
@@ -146,7 +140,7 @@ extension ComposeViewController : UITextViewDelegate {
         if saveTimer != nil {
             saveTimer.invalidate()
         }
-        saveTimer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false, block: { (timer) in
+        saveTimer = Timer.scheduledTimer(withTimeInterval: 0.4, repeats: false, block: { (timer) in
             self.save()
         })
     }
