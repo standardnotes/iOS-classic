@@ -27,17 +27,27 @@ class ItemManager {
         _sharedInstance = ItemManager(context: context)
     }
     
+    lazy var supportedItemTypes: [String] = {
+        return AppDelegate.sharedInstance.persistentContainer.managedObjectModel.entities.map({ (entity) -> String in
+            return entity.name!
+        })
+    }()
+    
     func mapResponseItemsToLocalItems(responseItems: [JSON], omitFields: [String]?) -> [Item] {
         var items: [Item] = []
         for var responseItem in responseItems {
+            let contentType = responseItem["content_type"].string!
+            if supportedItemTypes.contains(contentType) == false {
+                continue;
+            }
             if responseItem["deleted"].boolValue == true {
-                let item = findItem(uuid: responseItem["uuid"].string!, contentType: responseItem["content_type"].string!)
+                let item = findItem(uuid: responseItem["uuid"].string!, contentType: contentType)
                 if item != nil {
                     context.delete(item!)
                 }
                 continue
             }
-            let item = findOrCreateItem(uuid: responseItem["uuid"].string!, contentType: responseItem["content_type"].string!)
+            let item = findOrCreateItem(uuid: responseItem["uuid"].string!, contentType: contentType)
             if omitFields != nil {
                 for omitField in omitFields! {
                     responseItem[omitField] = JSON.null
