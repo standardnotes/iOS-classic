@@ -127,6 +127,9 @@ class NotesViewController: UIViewController {
     
     func presentActionSheetForNote(note: Note) {
         let alertController = UIAlertController(title: note.url, message: nil, preferredStyle: .actionSheet)
+    
+        let cell = self.tableView.cellForRow(at: self.resultsController.indexPath(forObject: note)!)
+        alertController.popoverPresentationController?.sourceView = cell
         
         let shareAction = UIAlertAction(title: "Share", style: .default, handler: {
             alert -> Void in

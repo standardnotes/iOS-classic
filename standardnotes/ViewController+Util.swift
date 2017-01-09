@@ -19,8 +19,13 @@ extension UIViewController {
         self.present(alertController, animated: true, completion: nil)
     }
     
-    func showConfirmationAlert(style: UIAlertControllerStyle, title: String, message: String, confirmString: String, confirmBlock: @escaping (() -> ())) {
+    func showConfirmationAlert(style: UIAlertControllerStyle, sourceView: UIView?, title: String, message: String, confirmString: String, confirmBlock: @escaping (() -> ())) {
+        
         let alertController = UIAlertController(title: title, message: message, preferredStyle: style)
+        if style == .actionSheet {
+            alertController.popoverPresentationController?.sourceView = sourceView
+        }
+        
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         let confirmAction = UIAlertAction(title: confirmString, style: .default, handler: {
             (action : UIAlertAction!) -> Void in

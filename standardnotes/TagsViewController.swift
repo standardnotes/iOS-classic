@@ -98,6 +98,9 @@ class TagsViewController: UIViewController {
     func presentActionSheetForTag(tag: Tag) {
         let alertController = UIAlertController(title: tag.url, message: nil, preferredStyle: .actionSheet)
         
+        let cell = self.tableView.cellForRow(at: self.resultsController.indexPath(forObject: tag)!)
+        alertController.popoverPresentationController?.sourceView = cell
+        
         let shareAction = UIAlertAction(title: "Share", style: .default, handler: {
             alert -> Void in
             ApiController.sharedInstance.shareItem(item: tag, completion: { (error) in

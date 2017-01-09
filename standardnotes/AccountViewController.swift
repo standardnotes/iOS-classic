@@ -86,11 +86,11 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
         
         let dirtyItems = ItemManager.sharedInstance.fetchDirty()
         if dirtyItems.count > 0 {
-            self.showConfirmationAlert(style: .alert, title: "Unsaved Changes", message: "You have unsaved changes. Are you sure you want to log out and remove all data from this device?", confirmString: "Sign Out", confirmBlock: {
+            self.showConfirmationAlert(style: .alert, sourceView: nil, title: "Unsaved Changes", message: "You have unsaved changes. Are you sure you want to log out and remove all data from this device?", confirmString: "Sign Out", confirmBlock: {
                 performSignout()
             })
         } else {
-            self.showConfirmationAlert(style: .actionSheet, title: "Sign out?", message: "Signing out will remove all items from this device.", confirmString: "Sign Out", confirmBlock: {
+            self.showConfirmationAlert(style: .actionSheet, sourceView: signOutButton, title: "Sign out?", message: "Signing out will remove all items from this device.", confirmString: "Sign Out", confirmBlock: {
                 performSignout()
             })
         }
@@ -184,6 +184,8 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
         }
         
         let alertController = UIAlertController(title: "Choose data format:", message: nil, preferredStyle: .actionSheet)
+        
+        alertController.popoverPresentationController?.sourceView = exportButton
         
         let encryptedAction = UIAlertAction(title: "Encrypted", style: .default, handler: {
             alert -> Void in
