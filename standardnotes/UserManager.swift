@@ -18,7 +18,6 @@ class UserManager {
 
     init() {
         email = UserDefaults.standard.object(forKey: "email") as! String?
-        password = UserDefaults.standard.object(forKey: "password") as! String?
         server = UserDefaults.standard.object(forKey: "server") as! String?
         jwt = UserDefaults.standard.object(forKey: "jwt") as! String?
         mk = UserDefaults.standard.object(forKey: "mk") as! String?
@@ -29,14 +28,28 @@ class UserManager {
     }
     
     var email: String!
-    var password: String!
     var server: String!
     var mk: String!
     var jwt: String!
     
+    private var _authParams: [String : Any]?
+    var authParams: [String : Any]? {
+        get {
+            if _authParams == nil {
+                return UserDefaults.standard.object(forKey: "authParams") as! [String : Any]?
+            }
+            
+            return _authParams
+        }
+        
+        set {
+            _authParams = newValue
+            UserDefaults.standard.setValue(newValue, forKey: "authParams")
+        }
+    }
+    
     func save() {
         UserDefaults.standard.set(email, forKey: "email")
-        UserDefaults.standard.set(password, forKey: "password")
         UserDefaults.standard.set(server, forKey: "server")
         UserDefaults.standard.set(jwt, forKey: "jwt")
         UserDefaults.standard.set(mk, forKey: "mk")
@@ -61,7 +74,6 @@ class UserManager {
         self.email = nil
         self.mk = nil
         self.jwt = nil
-        self.password = nil
         
         persist()
     }

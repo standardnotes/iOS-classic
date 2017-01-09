@@ -62,7 +62,7 @@ class ApiController {
     
     func register(email: String, password: String, completion: @escaping (Error?) -> ()) {
 
-        let authParams = createRegistrationAuthParams(forEmail: email)
+        var authParams = createRegistrationAuthParams(forEmail: email)
         let result = Crypto.sharedInstance.pbkdf2(hash: CCPBKDFAlgorithm(kCCPRFHmacAlgSHA512), password: password, salt: authParams["pw_salt"] as! String, keyByteCount: (authParams["pw_key_size"] as! Int)/8, rounds: authParams["pw_cost"] as! Int)!
         
         let pw = result.firstHalf()
@@ -81,6 +81,8 @@ class ApiController {
             }
             let json = JSON(data: response.data!)
             UserManager.sharedInstance.jwt = json["token"].string!
+            authParams.removeValue(forKey: "pw_nonce")
+            UserManager.sharedInstance.authParams = authParams
             UserManager.sharedInstance.save()
             completion(nil)
         }
@@ -111,6 +113,7 @@ class ApiController {
                 }
                 let json = JSON(data: response.data!)
                 UserManager.sharedInstance.jwt = json["token"].string!
+                UserManager.sharedInstance.authParams = authParams?.object as! [String : Any]?
                 UserManager.sharedInstance.save()
                 completion(nil)
             }
@@ -178,6 +181,17 @@ class ApiController {
     }
     
     func createParamsFromItem(item: Item) -> [String : Any] {
+        return createParamsFromItem(item: item, encrypted: !item.isPublic)
+    }
+    
+    func exportParamsForItem(item: Item, encrypted: Bool) -> [String : Any] {
+        var params = createParamsFromItem(item: item, encrypted: encrypted)
+        params["created_at"] = item.stringFromDate(date: item.createdAt)
+        params["updated_at"] = item.stringFromDate(date: item.updatedAt)
+        return params
+    }
+    
+    func createParamsFromItem(item: Item, encrypted: Bool) -> [String : Any] {
         var params = [String : Any]()
         params["content_type"] = item.contentType
         params["uuid"] = item.uuid
@@ -190,17 +204,17 @@ class ApiController {
         
         params["deleted"] = item.modelDeleted
         
-        if(item.isPublic) {
+        if(encrypted) {
+            // send encrypted
+            let encryptedParams = Crypto.sharedInstance.encryptionParams(forItem: item)
+            params.merge(with: encryptedParams)
+        } else {
             // send decrypted
             params["enc_item_key"] = NSNull()
             params["auth_hash"] = NSNull()
             params["content"] = "000" + Crypto.sharedInstance.base64(message: item.createContentJSONFromProperties().rawString()!)
-            
-        } else {
-            // send encrypted
-            let encryptedParams = Crypto.sharedInstance.encryptionParams(forItem: item)
-            params.merge(with: encryptedParams)
         }
+        
         return params
     }
     

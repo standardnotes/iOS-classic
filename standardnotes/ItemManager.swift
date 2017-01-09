@@ -182,38 +182,18 @@ class ItemManager {
     func signOut() {
         deleteAllItemsForEntityName(name: "Item")
     }
-    
-    func exportParamsForItem(item: Item) -> [String : Any] {
-        var params = [String : Any]()
-        params["content_type"] = item.contentType
-        params["uuid"] = item.uuid
-        
-        if item.presentationName != nil {
-            params["presentation_name"] = item.presentationName
-        }
-        
-        params["content"] = item.createContentJSONFromProperties().dictionaryObject
-        return params
-    }
-    
-    func JSONStringify(value: Any) -> String {
-        do {
-            let data = try JSONSerialization.data(withJSONObject: value)
-            let string = NSString(data: data, encoding: String.Encoding.utf8.rawValue)
-            return string as! String
-        } catch {
-            fatalError("Unable to stringify.")
-        }
-    }
 
-    func itemsExportJSONData() -> Data {
+    func itemsExportJSONData(encrypted: Bool) -> Data {
         let fetchRequest = NSFetchRequest<Item>(entityName: "Item")
         do {
             let items = try AppDelegate.sharedContext.fetch(fetchRequest)
-            let params = items.map { (item) -> JSON in
-                return JSON(exportParamsForItem(item: item))
+            let params = items.map { (item) -> [String : Any] in
+                return ApiController.sharedInstance.exportParamsForItem(item: item, encrypted: encrypted)
             }
-            let json = JSON(params)
+            var json = JSON(["items" : params])
+            if encrypted {
+                json["auth_params"] = JSON(UserManager.sharedInstance.authParams!)
+            }
             let data = try JSONSerialization.data(withJSONObject: json.object)
             return data
         }

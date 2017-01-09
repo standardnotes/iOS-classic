@@ -47,6 +47,13 @@ public class Item: NSManagedObject {
         return date!
     }
     
+    func stringFromDate(date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        let string = dateFormatter.string(from: date)
+        return string
+    }
+    
     func humanReadableCreateDate() -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .short
