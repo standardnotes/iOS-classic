@@ -212,7 +212,6 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
     func showEmailComposerWithData(data: Data) {
         let mailComposer = MFMailComposeViewController()
         mailComposer.mailComposeDelegate = self
-        mailComposer.setToRecipients(["me@bitar.io"])
         mailComposer.setSubject("Standard Notes Data Backup - \(Date())")
         mailComposer.addAttachmentData(data, mimeType: "application/json", fileName: "notes")
         self.present(mailComposer, animated: true, completion: nil)
