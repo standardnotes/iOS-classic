@@ -14,8 +14,8 @@ public class Note: Item {
   
     override func mapContentToLocalProperties(contentObject: JSON) {
         super.mapContentToLocalProperties(contentObject: contentObject)
-        self.title = contentObject["title"].string!
-        self.text = contentObject["text"].string!
+        self.title = contentObject["title"].string
+        self.text = contentObject["text"].string
     }
     
     public override func awakeFromInsert() {

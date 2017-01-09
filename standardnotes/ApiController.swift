@@ -168,13 +168,14 @@ class ApiController {
             } else {
                 ItemManager.sharedInstance.clearDirty(items: dirty)
                 let json = JSON(data: response.data!)
-                self.syncToken = json["sync_token"].string!
                 
                 // merge retreived items completely
                 let _ = self.handleItemsResponse(responseItems: json["retrieved_items"].array!, omitFields: nil)
                 // merge only metadata for saved items
                 let _ = self.handleItemsResponse(responseItems: json["saved_items"].array!, omitFields: ["content", "enc_item_key", "auth_hash"])
                 completion(nil)
+                
+                self.syncToken = json["sync_token"].string!
             }
         }
         
