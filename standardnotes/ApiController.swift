@@ -144,6 +144,7 @@ class ApiController {
     
     func sync(completion: @escaping (Error?) -> ()) {
         if UserManager.sharedInstance.signedIn == false {
+            ItemManager.sharedInstance.saveContext()
             completion(nil)
             return
         }
@@ -189,6 +190,7 @@ class ApiController {
         var params = createParamsFromItem(item: item, encrypted: encrypted)
         params["created_at"] = item.stringFromDate(date: item.createdAt)
         params["updated_at"] = item.stringFromDate(date: item.updatedAt)
+        params["content"] = item.createContentJSONFromProperties().object
         return params
     }
     

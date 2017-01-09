@@ -14,7 +14,7 @@ public class Tag: Item {
    
     override func mapContentToLocalProperties(contentObject: JSON) {
         super.mapContentToLocalProperties(contentObject: contentObject)
-        self.title = contentObject["title"].string!
+        self.title = contentObject["title"].string
     }
     
     public override func awakeFromInsert() {

@@ -140,7 +140,7 @@ extension ComposeViewController : UITextViewDelegate {
         if saveTimer != nil {
             saveTimer.invalidate()
         }
-        saveTimer = Timer.scheduledTimer(withTimeInterval: 0.4, repeats: false, block: { (timer) in
+        saveTimer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: false, block: { (timer) in
             self.save()
         })
     }

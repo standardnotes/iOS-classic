@@ -194,7 +194,7 @@ class ItemManager {
             if encrypted {
                 json["auth_params"] = JSON(UserManager.sharedInstance.authParams!)
             }
-            let data = try JSONSerialization.data(withJSONObject: json.object)
+            let data = try JSONSerialization.data(withJSONObject: json.object, options: .prettyPrinted)
             return data
         }
         catch {
