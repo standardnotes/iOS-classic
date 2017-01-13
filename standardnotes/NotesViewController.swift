@@ -232,6 +232,13 @@ extension NotesViewController : UITableViewDelegate, UITableViewDataSource {
         presentComposer(note: selectedObject)
         tableView.deselectRow(at: indexPath, animated: true)
     }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if (editingStyle == .delete) {
+            let selectedNote = resultsController.object(at: indexPath as IndexPath) as Note
+            deleteNote(note: selectedNote)
+        }
+    }
 }
 
 extension NotesViewController : NSFetchedResultsControllerDelegate {
