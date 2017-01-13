@@ -1,8 +1,8 @@
 # Standard Notes for iOS
 
-This app will be available for download from the App Store some time in January, 2017.
+This app can be downloaded from the iOS App Store [here](https://itunes.apple.com/us/app/standard-notes/id1191215138?ls=1&mt=8).
 
-For now, you can easily run the app from Xcode on your device.
+Or, easily run the app from Xcode on your device.
 
 Simply clone this repo, then update git submodules:
 
