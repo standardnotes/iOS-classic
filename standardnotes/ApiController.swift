@@ -183,7 +183,7 @@ class ApiController {
     }
     
     func createParamsFromItem(item: Item) -> [String : Any] {
-        return createParamsFromItem(item: item, encrypted: !item.isPublic)
+        return createParamsFromItem(item: item, encrypted: true)
     }
     
     func exportParamsForItem(item: Item, encrypted: Bool) -> [String : Any] {
@@ -198,12 +198,6 @@ class ApiController {
         var params = [String : Any]()
         params["content_type"] = item.contentType
         params["uuid"] = item.uuid
-        
-        if item.presentationName != nil {
-            params["presentation_name"] = item.presentationName
-        } else {
-            params["presentation_name"] = NSNull()
-        }
         
         params["deleted"] = item.modelDeleted
         
@@ -228,24 +222,6 @@ class ApiController {
         return items
     }
     
-    
-    func shareItem(item: Item, completion: @escaping (Error?) -> ()) {
-        item.presentationName = "_auto_"
-        item.dirty = true
-        item.markRelatedItemsAsDirty()
-        sync { (error) in
-            completion(error)
-        }
-    }
-    
-    func unshareItem(item: Item, completion: @escaping (Error?) -> ()) {
-        item.presentationName = nil
-        item.dirty = true
-        item.markRelatedItemsAsDirty()
-        sync { (error) in
-            completion(error)
-        }
-    }
     
     func deleteItem(item: Item, completion: @escaping ((Error?) -> ())) {
         Alamofire.request("\(self.server)/items/\(item.uuid)", method: .delete, headers: headers()).responseJSON { response in

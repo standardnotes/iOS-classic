@@ -24,12 +24,10 @@ public class Item: NSManagedObject {
     func updateFromJSON(json: JSON) {
         self.uuid = json["uuid"].string!
         self.contentType = json["content_type"].string!
-        self.presentationName = json["presentation_name"].string
 
         if json["enc_item_key"] != JSON.null {
             self.encItemKey = json["enc_item_key"].string
         }
-        self.url = json["presentation_url"].string
         
         self.createdAt = dateFromString(string: json["created_at"].string!)
         self.updatedAt = dateFromString(string: json["updated_at"].string!)
@@ -103,10 +101,6 @@ public class Item: NSManagedObject {
     
     func structureParams() -> [String : Any] {
         return ["references" : referencesParams()]
-    }
-    
-    var isPublic: Bool {
-        return self.presentationName != nil
     }
     
     var encryptionEnabled: Bool {

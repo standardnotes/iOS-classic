@@ -126,40 +126,11 @@ class NotesViewController: UIViewController {
     }
     
     func presentActionSheetForNote(note: Note) {
-        let alertController = UIAlertController(title: note.url, message: nil, preferredStyle: .actionSheet)
+        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
     
         let cell = self.tableView.cellForRow(at: self.resultsController.indexPath(forObject: note)!)
         alertController.popoverPresentationController?.sourceView = cell
-        
-        let shareAction = UIAlertAction(title: "Share", style: .default, handler: {
-            alert -> Void in
-            ApiController.sharedInstance.shareItem(item: note, completion: { (error) in
-                if error != nil {
-                    self.showAlert(title: "Oops", message: error!.localizedDescription)
-                } else {
-                    self.tableView.reloadData()
-                    self.presentActionSheetForNote(note: note)
-                }
-            })
-        })
-        
-        let openInSafariAction = UIAlertAction(title: "View In Safari", style: .default, handler: {
-            alert -> Void in
-            UIApplication.shared.open(URL(string: note.url!)!, options: [:], completionHandler: nil)
-        })
-        
-        let unshareAction = UIAlertAction(title: "Unshare", style: .default, handler: {
-            alert -> Void in
-            ApiController.sharedInstance.unshareItem(item: note, completion: { (error) in
-                if error != nil {
-                    self.showAlert(title: "Oops", message: error!.localizedDescription)
-                } else {
-                    self.tableView.reloadData()
-                    self.presentActionSheetForNote(note: note)
-                }
-            })
-        })
-        
+                
         let deleteAction = UIAlertAction(title: "Delete", style: .destructive, handler: {
             alert -> Void in
             self.showDestructiveAlert(title: "Confirm Deletion", message: "Are you sure you want to delete this note?", buttonString: "Delete", block: { 
@@ -172,12 +143,6 @@ class NotesViewController: UIViewController {
             
         })
         
-        if note.isSharedIndividually {
-            alertController.addAction(unshareAction)
-            alertController.addAction(openInSafariAction)
-        } else {
-            alertController.addAction(shareAction)
-        }
         alertController.addAction(deleteAction)
         alertController.addAction(cancelAction)
         

@@ -107,7 +107,6 @@ class Crypto {
     func setKey(forItem item: Item) {
         // key required to be 512 bits
         let hex = generateRandomHexKey(size: 512)
-        print("Generated random key for item: \(hex)")
         // encrypt key with master key
         item.encItemKey = encrypt(message: hex, key: UserManager.sharedInstance.mk)
     }

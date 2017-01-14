@@ -20,8 +20,6 @@ extension Item {
     @NSManaged public var content: String?
     @NSManaged public var contentType: String!
     @NSManaged public var encItemKey: String?
-    @NSManaged public var url: String?
-    @NSManaged public var presentationName: String?
     @NSManaged public var dirty: Bool
     @NSManaged public var draft: Bool
     @NSManaged public var modelDeleted: Bool

@@ -96,39 +96,10 @@ class TagsViewController: UIViewController {
     }
     
     func presentActionSheetForTag(tag: Tag) {
-        let alertController = UIAlertController(title: tag.url, message: nil, preferredStyle: .actionSheet)
+        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         let cell = self.tableView.cellForRow(at: self.resultsController.indexPath(forObject: tag)!)
         alertController.popoverPresentationController?.sourceView = cell
-        
-        let shareAction = UIAlertAction(title: "Share", style: .default, handler: {
-            alert -> Void in
-            ApiController.sharedInstance.shareItem(item: tag, completion: { (error) in
-                if error != nil {
-                    self.showAlert(title: "Oops", message: error!.localizedDescription)
-                } else {
-                    self.tableView.reloadData()
-                    self.presentActionSheetForTag(tag: tag)
-                }
-            })
-        })
-        
-        let openInSafariAction = UIAlertAction(title: "View In Safari", style: .default, handler: {
-            alert -> Void in
-            UIApplication.shared.open(URL(string: tag.url!)!, options: [:], completionHandler: nil)
-        })
-        
-        let unshareAction = UIAlertAction(title: "Unshare", style: .default, handler: {
-            alert -> Void in
-            ApiController.sharedInstance.unshareItem(item: tag, completion: { (error) in
-                if error != nil {
-                    self.showAlert(title: "Oops", message: error!.localizedDescription)
-                } else {
-                    self.tableView.reloadData()
-                    self.presentActionSheetForTag(tag: tag)
-                }
-            })
-        })
         
         let deleteAction = UIAlertAction(title: "Delete", style: .destructive, handler: {
             alert -> Void in
@@ -145,13 +116,7 @@ class TagsViewController: UIViewController {
             (action : UIAlertAction!) -> Void in
             
         })
-        
-        if tag.isPublic {
-            alertController.addAction(unshareAction)
-            alertController.addAction(openInSafariAction)
-        } else {
-            alertController.addAction(shareAction)
-        }
+
         alertController.addAction(deleteAction)
         alertController.addAction(cancelAction)
         
