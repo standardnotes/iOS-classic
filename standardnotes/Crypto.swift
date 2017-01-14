@@ -19,7 +19,7 @@ class Crypto {
               "pw_func" : "pbkdf2",
               "pw_alg": "sha512",
               "pw_key_size": 512,
-              "pw_cost": 60000
+              "pw_cost": 5000
         ]
     }
     
