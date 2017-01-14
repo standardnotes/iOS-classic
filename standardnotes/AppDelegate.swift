@@ -27,6 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        Theme.Initialize()
         ItemManager.initializeSharedInstance(context: self.persistentContainer.viewContext)
         return true
     }
