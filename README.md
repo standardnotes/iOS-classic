@@ -16,3 +16,7 @@ git submodule update --init
 ![app](https://github.com/standardnotes/iOS/blob/master/screenshots/small/2.png?raw=true)
 ![app](https://github.com/standardnotes/iOS/blob/master/screenshots/small/3.png?raw=true)
 ![app](https://github.com/standardnotes/iOS/blob/master/screenshots/small/4.png?raw=true)
+
+## License
+
+Licensed under the GPLv3: http://www.gnu.org/licenses/gpl-3.0.html
