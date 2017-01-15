@@ -23,6 +23,9 @@ class NotesViewController: UIViewController {
         configureNavBar()
         reloadResults()
         
+        // fixes dark gray shadow during vc transition
+        self.navigationController?.view.backgroundColor = UIColor.white
+        
         NotificationCenter.default.addObserver(forName: NSNotification.Name.UIApplicationWillEnterForeground, object: nil, queue: OperationQueue.main) { (notification) in
             self.refreshItems()
         }
@@ -95,8 +98,10 @@ class NotesViewController: UIViewController {
     func presentComposer(note: Note?) {
         let compose = self.storyboard?.instantiateViewController(withIdentifier: "Compose") as! ComposeViewController
         compose.note = note
-        let navController = UINavigationController(rootViewController: compose)
-        self.present(navController, animated: true, completion: nil)
+//        let navController = UINavigationController(rootViewController: compose)
+//        self.present(navController, animated: true, completion: nil)
+        
+        self.navigationController?.pushViewController(compose, animated: true)
     }
     
     func reloadResults() {

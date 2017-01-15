@@ -17,12 +17,24 @@ class ComposeViewController: UIViewController {
     var saving: Bool = false
     var saved: Bool = false
     var saveTimer: Timer!
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.automaticallyAdjustsScrollViewInsets = false
+        
+        textView.layoutManager.delegate = self
+        textView.textContainerInset = UIEdgeInsetsMake(12, 12, 0, 12)
+
+        if self.note == nil {
+            self.textView.becomeFirstResponder()
+        }
+
         configureNote()
         configureNavBar()
         configureKeyboardNotifications()
+        
+        titleTextField.text = self.note?.safeTitle()
+        textView.text = self.note?.safeText()
     }
     
     func configureKeyboardNotifications() {
@@ -47,18 +59,11 @@ class ComposeViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        if self.note.title != nil {
-            self.titleTextField.text = self.note.safeTitle()
-            self.textView.text = self.note.safeText()
-        }
-        self.textView.becomeFirstResponder()
     }
     
     func configureNavBar() {
         let tagsTitle = note.tags!.count > 0 ? "Tags (\(note.tags!.count))" : "Tags"
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: tagsTitle, style: .plain, target: self, action: #selector(tagsPressed))
-        
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Dismiss", style: .plain, target: self, action: #selector(dismissPressed))
     }
     
     func reloadTitle() {
@@ -101,13 +106,6 @@ class ComposeViewController: UIViewController {
         self.present(nav, animated: true, completion: nil)
     }
 
-    func dismissPressed(_ sender: Any) {
-        AppDelegate.sharedInstance.saveContext()
-        self.textView.resignFirstResponder()
-        self.titleTextField.resignFirstResponder()
-        self.dismiss(animated: true, completion: nil)
-    }
-   
     func save() {
         saving = true
         saved = false
@@ -131,6 +129,14 @@ class ComposeViewController: UIViewController {
     
     @IBAction func titleFieldEditingChanged(_ sender: Any) {
         beginSaveTimer()
+    }
+    
+}
+
+extension ComposeViewController : NSLayoutManagerDelegate {
+  
+    func layoutManager(_ layoutManager: NSLayoutManager, lineSpacingAfterGlyphAt glyphIndex: Int, withProposedLineFragmentRect rect: CGRect) -> CGFloat {
+        return 2
     }
     
 }

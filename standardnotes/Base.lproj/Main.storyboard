@@ -90,7 +90,7 @@
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Notes" id="vQx-2q-Abd"/>
+                    <tabBarItem key="tabBarItem" title="Notes" image="ico-list" id="vQx-2q-Abd"/>
                     <navigationItem key="navigationItem" title="Notes" id="oBW-UN-OMP"/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
@@ -100,12 +100,14 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1671.2" y="124.58770614692655"/>
+            <point key="canvasLocation" x="-1226" y="278"/>
         </scene>
         <!--Notes-->
         <scene sceneID="2jz-CM-Jsd">
             <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="pQ4-hE-IyM" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationController id="jBx-oB-fEY" sceneMemberID="viewController">
+                    <extendedEdge key="edgesForExtendedLayout"/>
                     <tabBarItem key="tabBarItem" title="Notes" image="ico-list" id="Mk7-qQ-C5r"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="HEd-gK-luz">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
@@ -115,14 +117,13 @@
                         <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="DGo-hf-by8"/>
                     </connections>
                 </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="pQ4-hE-IyM" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2354" y="125"/>
+            <point key="canvasLocation" x="-1994" y="278"/>
         </scene>
         <!--Compose-->
         <scene sceneID="pOC-Hj-w5t">
             <objects>
-                <viewController storyboardIdentifier="Compose" title="Compose" id="nsi-ga-c3H" customClass="ComposeViewController" customModule="standardnotes" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="Compose" autoresizesArchivedViewToFullSize="NO" title="Compose" hidesBottomBarWhenPushed="YES" id="nsi-ga-c3H" customClass="ComposeViewController" customModule="standardnotes" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="EoA-eV-qfT"/>
                         <viewControllerLayoutGuide type="bottom" id="Oq1-bZ-ZPw"/>
@@ -131,10 +132,10 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" keyboardDismissMode="interactive" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="bf6-Tp-N0O">
-                                <rect key="frame" x="8" y="116" width="359" height="551"/>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" keyboardDismissMode="interactive" text="Hello world" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="bf6-Tp-N0O">
+                                <rect key="frame" x="0.0" y="116" width="375" height="551"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                 <connections>
                                     <outlet property="delegate" destination="nsi-ga-c3H" id="RGd-Md-VMf"/>
@@ -146,12 +147,12 @@
                                 <color key="backgroundColor" white="0.93152612761447307" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Note title" adjustsFontSizeToFit="NO" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="bWw-mV-Jy7">
-                                <rect key="frame" x="13" y="72" width="352" height="41"/>
+                                <rect key="frame" x="16" y="72" width="343" height="41"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="41" id="Fqc-50-JbS"/>
                                 </constraints>
                                 <nil key="textColor"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                 <connections>
                                     <action selector="titleFieldEditingChanged:" destination="nsi-ga-c3H" eventType="editingChanged" id="oLZ-TV-MeK"/>
@@ -160,10 +161,11 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="bWw-mV-Jy7" firstAttribute="leading" secondItem="Pdu-3j-fWh" secondAttribute="leading" constant="13" id="JNT-ZT-33y"/>
-                            <constraint firstItem="bf6-Tp-N0O" firstAttribute="leading" secondItem="Pdu-3j-fWh" secondAttribute="leading" constant="8" id="PS2-Mq-0Xr"/>
-                            <constraint firstAttribute="trailing" secondItem="bf6-Tp-N0O" secondAttribute="trailing" constant="8" id="pCa-f7-sMm"/>
-                            <constraint firstAttribute="trailing" secondItem="bWw-mV-Jy7" secondAttribute="trailing" constant="10" id="uDW-xg-YPb"/>
+                            <constraint firstAttribute="bottom" secondItem="bf6-Tp-N0O" secondAttribute="bottom" id="2hu-X5-gr6"/>
+                            <constraint firstItem="bWw-mV-Jy7" firstAttribute="leading" secondItem="Pdu-3j-fWh" secondAttribute="leading" constant="16" id="JNT-ZT-33y"/>
+                            <constraint firstItem="bf6-Tp-N0O" firstAttribute="leading" secondItem="Pdu-3j-fWh" secondAttribute="leading" id="PS2-Mq-0Xr"/>
+                            <constraint firstAttribute="trailing" secondItem="bf6-Tp-N0O" secondAttribute="trailing" id="pCa-f7-sMm"/>
+                            <constraint firstAttribute="trailing" secondItem="bWw-mV-Jy7" secondAttribute="trailing" constant="16" id="uDW-xg-YPb"/>
                             <constraint firstItem="Oq1-bZ-ZPw" firstAttribute="top" secondItem="bf6-Tp-N0O" secondAttribute="bottom" id="w58-TX-eJW"/>
                             <constraint firstItem="bf6-Tp-N0O" firstAttribute="top" secondItem="bWw-mV-Jy7" secondAttribute="bottom" constant="3" id="xDv-7Z-Q4V"/>
                             <constraint firstItem="bWw-mV-Jy7" firstAttribute="top" secondItem="EoA-eV-qfT" secondAttribute="bottom" constant="8" id="xzf-4v-IZQ"/>
@@ -178,7 +180,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Mo1-6L-ygt" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1674.4000000000001" y="-619.34032983508246"/>
+            <point key="canvasLocation" x="-70" y="1160"/>
         </scene>
         <!--Tags-->
         <scene sceneID="Lv6-AF-XbD">
@@ -243,12 +245,13 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="b5T-sH-hjL" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2354.4000000000001" y="-619.34032983508246"/>
+            <point key="canvasLocation" x="-906" y="1160"/>
         </scene>
         <!--Tab Bar View Controller-->
         <scene sceneID="XEx-FQ-YvN">
             <objects>
                 <tabBarController id="kP2-Xk-3i1" customClass="TabBarViewController" customModule="standardnotes" customModuleProvider="target" sceneMemberID="viewController">
+                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
                     <tabBar key="tabBar" contentMode="scaleToFill" id="C5t-Qy-mEZ">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -424,11 +427,12 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Pxh-U3-ZlM" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="792.79999999999995" y="7.6461769115442282"/>
+            <point key="canvasLocation" x="1132" y="278"/>
         </scene>
         <!--Account-->
         <scene sceneID="xwW-kJ-PHH">
             <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="pz8-y6-nYV" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationController id="mb8-6m-L4k" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Account" image="ico-account" id="K0R-zx-Rk2"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="iyK-dF-DM7">
@@ -439,9 +443,8 @@
                         <segue destination="FhO-uZ-mXj" kind="relationship" relationship="rootViewController" id="2uv-tP-6s0"/>
                     </connections>
                 </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="pz8-y6-nYV" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-42" y="9"/>
+            <point key="canvasLocation" x="346" y="278"/>
         </scene>
     </scenes>
     <resources>
