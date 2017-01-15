@@ -28,8 +28,16 @@ class TagsViewController: UIViewController {
         configureNavBar()
     }
     
+    var isModal: Bool {
+        return self.presentingViewController?.presentedViewController == self
+            || (self.navigationController != nil && self.navigationController?.presentingViewController?.presentedViewController == self.navigationController)
+            || self.tabBarController?.presentingViewController is UITabBarController
+    }
+    
     func configureNavBar() {
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Dismiss", style: .plain, target: self, action: #selector(donePressed))
+        if self.isModal {
+            self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Dismiss", style: .plain, target: self, action: #selector(donePressed))
+        }
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New", style: .plain, target: self, action: #selector(newTagPressed))
     }
     
@@ -67,6 +75,14 @@ class TagsViewController: UIViewController {
     func donePressed() {
         self.selectionCompletion?(self.selectedTags.allObjects as! [Tag])
         self.dismiss(animated: true, completion: nil)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+     
+        if !self.isModal {
+            self.selectionCompletion?(self.selectedTags.allObjects as! [Tag])
+        }
     }
     
     func configureResultsController() {

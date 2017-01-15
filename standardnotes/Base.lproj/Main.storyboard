@@ -185,7 +185,7 @@
         <!--Tags-->
         <scene sceneID="Lv6-AF-XbD">
             <objects>
-                <viewController storyboardIdentifier="Tags" title="Tags" id="Eol-qQ-MB3" customClass="TagsViewController" customModule="standardnotes" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="Tags" title="Tags" hidesBottomBarWhenPushed="YES" id="Eol-qQ-MB3" customClass="TagsViewController" customModule="standardnotes" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="XdM-Z4-ZJO"/>
                         <viewControllerLayoutGuide type="bottom" id="5SO-mQ-BJ6"/>
@@ -203,7 +203,7 @@
                                         <rect key="frame" x="0.0" y="28" width="375" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="8AC-fi-swY" id="IVl-pp-XOa">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="49.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="49"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9VV-zC-Aes">

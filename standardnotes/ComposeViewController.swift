@@ -25,10 +25,6 @@ class ComposeViewController: UIViewController {
         textView.layoutManager.delegate = self
         textView.textContainerInset = UIEdgeInsetsMake(12, 12, 0, 12)
 
-        if self.note == nil {
-            self.textView.becomeFirstResponder()
-        }
-
         configureNote()
         configureNavBar()
         configureKeyboardNotifications()
@@ -59,6 +55,17 @@ class ComposeViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if self.note.text == nil {
+            self.textView.becomeFirstResponder()
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
     }
     
     func configureNavBar() {
@@ -102,8 +109,9 @@ class ComposeViewController: UIViewController {
             self.configureNavBar()
             self.save()
         }
-        let nav = UINavigationController(rootViewController: tags)
-        self.present(nav, animated: true, completion: nil)
+//        let nav = UINavigationController(rootViewController: tags)
+//        self.present(nav, animated: true, completion: nil)
+        self.navigationController?.pushViewController(tags, animated: true)
     }
 
     func save() {
