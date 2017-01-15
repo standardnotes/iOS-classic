@@ -134,11 +134,9 @@ class Crypto {
                 let content = item["content"].string!
                 let contentData = content.data(using: .utf8)!
                 let akHexData = ak.toHexadecimalData()!
-//                print("Taking hmac of \(String(data: contentData, encoding: .utf8)!) using key \(akHexData.hexEncodedString())")
 
                 let computedData = HMAC256(contentData, akHexData)
                 let authHash = computedData!.hexEncodedString()
-//                print("Computed auth hash: \(authHash). Should be \(expectedHash)")
                 if(authHash != item["auth_hash"].string!) {
                     print("Auth hash does not match, continuing")
                     continue
@@ -147,14 +145,12 @@ class Crypto {
                 let contentToDecrypt = item["content"].string!.substring(from: 3)
                 let decryptedContent = decrypt(message: contentToDecrypt, hexKey: ek)
                 items[index]["content"] = JSON(decryptedContent)
-//                print("Decrypted content \(decryptedContent) JSON body: \(item["content"].string)")
             } else {
-                let contentToDecode = item["content"].string!.substring(from: 3)
-                items[index]["content"] = JSON(Crypto.sharedInstance.base64decode(base64String: contentToDecode))
+                if let contentToDecode = item["content"].string?.substring(from: 3) {
+                    items[index]["content"] = JSON(Crypto.sharedInstance.base64decode(base64String: contentToDecode))
+                }
             }
         }
-        
-//        print("Before returning: \(items)")
     }
 
 

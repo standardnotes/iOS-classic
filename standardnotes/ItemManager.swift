@@ -36,18 +36,18 @@ class ItemManager {
     func mapResponseItemsToLocalItems(responseItems: [JSON], omitFields: [String]?) -> [Item] {
         var items: [Item] = []
         for var responseItem in responseItems {
-            let contentType = responseItem["content_type"].string!
-            if supportedItemTypes.contains(contentType) == false {
+            let contentType = responseItem["content_type"].string
+            if contentType == nil || supportedItemTypes.contains(contentType!) == false {
                 continue;
             }
             if responseItem["deleted"].boolValue == true {
-                let item = findItem(uuid: responseItem["uuid"].string!, contentType: contentType)
+                let item = findItem(uuid: responseItem["uuid"].string!, contentType: contentType!)
                 if item != nil {
                     context.delete(item!)
                 }
                 continue
             }
-            let item = findOrCreateItem(uuid: responseItem["uuid"].string!, contentType: contentType)
+            let item = findOrCreateItem(uuid: responseItem["uuid"].string!, contentType: contentType!)
             if omitFields != nil {
                 for omitField in omitFields! {
                     responseItem[omitField] = JSON.null
