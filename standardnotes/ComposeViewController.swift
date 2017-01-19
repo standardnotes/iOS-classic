@@ -90,7 +90,7 @@ class ComposeViewController: UIViewController {
         self.navigationItem.titleView = label
     }
     
-    let NoteTitlePlaceholder = "Note"
+    let NoteTitlePlaceholder = ""
     
     func configureNote() {
         if self.note == nil {
