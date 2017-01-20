@@ -190,7 +190,9 @@ class ApiController {
         var params = createParamsFromItem(item: item, encrypted: encrypted)
         params["created_at"] = item.stringFromDate(date: item.createdAt)
         params["updated_at"] = item.stringFromDate(date: item.updatedAt)
-        params["content"] = item.createContentJSONFromProperties().object
+        if !encrypted {
+            params["content"] = item.createContentJSONFromProperties().object
+        }
         return params
     }
     
