@@ -32,6 +32,27 @@ class UserManager {
     var mk: String!
     var jwt: String!
     
+    //#MARK TouchID modifies User default
+    var touchIDEnabled: Bool{
+        
+        get{
+            return UserDefaults.standard.bool(forKey: "touchIDEnabled")
+        }
+        
+        set{
+            UserDefaults.standard.set(newValue, forKey: "touchIDEnabled")
+            UserDefaults.standard.synchronize()
+        }
+        
+        
+    }
+    
+    public func toggleTouchID(){
+        
+        touchIDEnabled = !touchIDEnabled
+        
+    }
+    
     private var _authParams: [String : Any]?
     var authParams: [String : Any]? {
         get {
@@ -70,6 +91,7 @@ class UserManager {
         UserDefaults.standard.removeObject(forKey: "password")
         UserDefaults.standard.removeObject(forKey: "jwt")
         UserDefaults.standard.removeObject(forKey: "mk")
+        UserDefaults.standard.removeObject(forKey: "touchIDEnabled")
         
         self.email = nil
         self.mk = nil

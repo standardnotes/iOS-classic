@@ -18,6 +18,7 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var signOutButton: UIButton!
     @IBOutlet weak var exportButton: UIButton!
+    @IBOutlet weak var touchIDButton: UIButton!
     
     var password: String?
     
@@ -45,6 +46,7 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
             self.registerButton.isEnabled = false
             self.signOutButton.isEnabled = true
             self.exportButton.isEnabled = true
+            
         } else {
             self.signInButton.isEnabled = true
             self.registerButton.isEnabled = true
@@ -52,7 +54,7 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
             self.exportButton.isEnabled = false
         }
 
-        
+        self.touchIDButton.isSelected = UserManager.sharedInstance.touchIDEnabled
         self.serverTextField.isEnabled = !UserManager.sharedInstance.signedIn
         self.emailTextField.isEnabled = !UserManager.sharedInstance.signedIn
         self.passwordTextField.isEnabled = !UserManager.sharedInstance.signedIn
@@ -244,6 +246,14 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
             self.accountStatusChanged(true)
             self.reloadData()
         }
+    }
+    
+    
+    @IBAction func toggleTouchID(toggleButton: UIButton) {
+        
+        UserManager.sharedInstance.toggleTouchID()
+        touchIDButton.isSelected = UserManager.sharedInstance.touchIDEnabled
+        
     }
 }
 
