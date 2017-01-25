@@ -109,68 +109,45 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func attemptFingerPrint(){
-        
         lockOutAlertVC?.dismiss(animated: false, completion: nil)
         lockOutAlertVC = nil
-        
         guard UserManager.sharedInstance.touchIDEnabled else { return }
-        
+        UIApplication.shared.beginIgnoringInteractionEvents()
+        // return tab to accounts page
+        (UIApplication.shared.keyWindow?.rootViewController as? UITabBarController)?.selectedIndex = 1
         let touchIDContext = LAContext()
-        
         var error : NSError?
-        
         let reasonString = "Authentication is needed to access your notes."
-        
         if touchIDContext.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error){
-            
             touchIDContext.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reasonString, reply: { [weak self] (success, touchIDError) in
-                
-                guard !success else {
+                guard success else {
+                    print(error?.localizedDescription ?? "unknown error")
+                    OperationQueue.main.addOperation {
+                        UIApplication.shared.endIgnoringInteractionEvents()
+                        self?.presentLockAlert()
+                    }
                     return
                 }
-                
-                
-                // Optionally the error description can be displayed on the console.
-                print(error?.localizedDescription ?? "unknown error")
-                
-                OperationQueue.main.addOperation {
-                    
-                    self?.presentLockAlert()
-                    
-                }
-                
-                
+                UIApplication.shared.endIgnoringInteractionEvents()
             })
-        
         } else {
-            
+            UIApplication.shared.endIgnoringInteractionEvents()
             print(error?.localizedDescription ?? "unknown error")
-        
         }
         
     }
     
     func presentLockAlert(){
-        
         guard lockOutAlertVC == nil else {
             return
         }
-        
         let alertController = UIAlertController(title: "Locked Out", message: "Notes are locked with touch ID please try again.", preferredStyle: .alert)
-        
         let retryTouchIDAction = UIAlertAction(title: "Try Again", style: .default, handler: { [weak self]
             alert -> Void in
-            
             self?.attemptFingerPrint()
-            
-            
         })
-        
-
         alertController.addAction(retryTouchIDAction)
-        
         UIApplication.shared.keyWindow?.rootViewController?.present(alertController, animated: true, completion: nil)
-        
         lockOutAlertVC = alertController
         
     }

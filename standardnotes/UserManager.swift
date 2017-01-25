@@ -34,23 +34,17 @@ class UserManager {
     
     //#MARK TouchID modifies User default
     var touchIDEnabled: Bool{
-        
         get{
             return UserDefaults.standard.bool(forKey: "touchIDEnabled")
         }
-        
         set{
             UserDefaults.standard.set(newValue, forKey: "touchIDEnabled")
             UserDefaults.standard.synchronize()
         }
-        
-        
     }
     
     public func toggleTouchID(){
-        
         touchIDEnabled = !touchIDEnabled
-        
     }
     
     private var _authParams: [String : Any]?

@@ -250,10 +250,8 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
     
     
     @IBAction func toggleTouchID(toggleButton: UIButton) {
-        
         UserManager.sharedInstance.toggleTouchID()
         touchIDButton.isSelected = UserManager.sharedInstance.touchIDEnabled
-        
     }
 }
 
