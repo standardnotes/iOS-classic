@@ -12,6 +12,7 @@ import CoreData
 class NotesViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var searchTextField: UITextField!
     
     var resultsController: NSFetchedResultsController<Note>!
     var selectedTags = [Tag]()
@@ -107,17 +108,36 @@ class NotesViewController: UIViewController {
     func reloadResults() {
         let fetchRequest = NSFetchRequest<Note>(entityName: "Note")
         fetchRequest.predicate = NSPredicate(format: "draft == false")
-        if selectedTags.count > 0 {
-            var predicates = [NSPredicate]()
+        var predicates = [NSPredicate]()
+        
+        // handle the case of search text is entered
+        if let searchText = searchTextField.text, searchText != "" {
+            if selectedTags.count > 0 { // tags also selected
+                var selectedUUIDs = [String]()
+                for tag in selectedTags {
+                    selectedUUIDs += [tag.uuid]
+                }
+                let searchPredicate = NSPredicate(format: "(ANY tags.uuid in %@) AND ((title contains %@) OR (text contains %@) OR (tags.title contains %@))",selectedUUIDs,searchText,searchText,searchText)
+                predicates.append(searchPredicate)
+            } else {
+                let searchPredicate = NSPredicate(format: "(title contains %@) OR (text contains %@) OR (tags.title contains %@)",searchText,searchText,searchText)
+                predicates.append(searchPredicate)
+            }
+        } else { // handle tags
             for tag in selectedTags {
                 let tagPredicate = NSPredicate(format: "ANY tags.uuid == %@", tag.uuid)
                 predicates.append(tagPredicate)
             }
-            let tagPredicate = NSCompoundPredicate(orPredicateWithSubpredicates: predicates)
-            fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [fetchRequest.predicate!, tagPredicate])
         }
+        
         let sort = NSSortDescriptor(key: "createdAt", ascending: false)
         fetchRequest.sortDescriptors = [sort]
+        
+        if predicates.count > 0 {
+            let searchPredicates = NSCompoundPredicate(orPredicateWithSubpredicates: predicates)
+            fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [fetchRequest.predicate!, searchPredicates])
+        }
+        
         resultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: AppDelegate.sharedContext, sectionNameKeyPath: nil, cacheName: nil)
     
         resultsController.delegate = self
@@ -163,6 +183,27 @@ class NotesViewController: UIViewController {
                 self.showAlert(title: "Oops", message: "There was an error deleting your note. Please try again.")
             }
         }
+    }
+}
+
+/**
+   Notes searching functions
+ */
+extension NotesViewController {
+    @IBAction func searchNotesDidBeginEditing( textField: UITextField){
+        navigationController?.setNavigationBarHidden(true, animated: true)
+    }
+    
+    @IBAction func searchNotesDidEndEditing( textField: UITextField) {
+        navigationController?.setNavigationBarHidden(false, animated: true)
+    }
+    
+    @IBAction func searchNotesWasEdited( textField: UITextField) {
+        reloadResults()
+    }
+    
+    @IBAction func textFieldDidDone( textField: UITextField) {
+        textField.resignFirstResponder()
     }
 }
 
