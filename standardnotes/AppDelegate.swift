@@ -118,6 +118,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
+    func navigateToNotesController(afterDelay: Double) {
+        // return tab to accounts page
+        delay(afterDelay) {
+            (UIApplication.shared.keyWindow?.rootViewController as? UITabBarController)?.selectedIndex = 0
+        }
+    }
+    
     func attemptFingerPrint(){
         lockOutAlertVC?.dismiss(animated: false, completion: nil)
         lockOutAlertVC = nil
@@ -140,6 +147,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     return
                 }
                 UIApplication.shared.endIgnoringInteractionEvents()
+                self?.navigateToNotesController(afterDelay: 0.01)
             })
         } else {
             UIApplication.shared.endIgnoringInteractionEvents()
