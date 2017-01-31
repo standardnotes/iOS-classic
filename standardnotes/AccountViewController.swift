@@ -8,6 +8,7 @@
 
 import UIKit
 import MessageUI
+import LocalAuthentication
 
 class AccountViewController: UITableViewController, MFMailComposeViewControllerDelegate {
     
@@ -18,6 +19,7 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var signOutButton: UIButton!
     @IBOutlet weak var exportButton: UIButton!
+    @IBOutlet weak var touchIDButton: UIButton!
     
     var password: String?
     
@@ -45,13 +47,26 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
             self.registerButton.isEnabled = false
             self.signOutButton.isEnabled = true
             self.exportButton.isEnabled = true
+            
         } else {
             self.signInButton.isEnabled = true
             self.registerButton.isEnabled = true
             self.signOutButton.isEnabled = false
             self.exportButton.isEnabled = false
         }
-
+        
+        var error : NSError?
+        let touchIDContext = LAContext()
+        self.touchIDButton.isEnabled = touchIDContext.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
+        if !touchIDButton.isEnabled {
+            touchIDButton.setTitle("Your phone does not support TouchID", for: UIControlState.normal)
+        } else {
+            if UserManager.sharedInstance.touchIDEnabled {
+                touchIDButton.setTitle("Disable TouchID", for: UIControlState.normal)
+            } else {
+                touchIDButton.setTitle("Enable TouchID", for: UIControlState.normal)
+            }
+        }
         
         self.serverTextField.isEnabled = !UserManager.sharedInstance.signedIn
         self.emailTextField.isEnabled = !UserManager.sharedInstance.signedIn
@@ -243,6 +258,16 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
             }
             self.accountStatusChanged(true)
             self.reloadData()
+        }
+    }
+    
+    
+    @IBAction func toggleTouchID(toggleButton: UIButton) {
+        UserManager.sharedInstance.toggleTouchID()
+        if UserManager.sharedInstance.touchIDEnabled {
+            touchIDButton.setTitle("Disable TouchID", for: UIControlState.normal)
+        } else {
+             touchIDButton.setTitle("Enable TouchID", for: UIControlState.normal)
         }
     }
 }
