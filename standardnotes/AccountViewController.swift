@@ -59,12 +59,12 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
         let touchIDContext = LAContext()
         self.touchIDButton.isEnabled = touchIDContext.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
         if !touchIDButton.isEnabled {
-            touchIDButton.setTitle("Your phone does not support TouchID", for: UIControlState.normal)
+            touchIDButton.setTitle("Touch ID not available.", for: UIControlState.normal)
         } else {
             if UserManager.sharedInstance.touchIDEnabled {
-                touchIDButton.setTitle("Disable TouchID", for: UIControlState.normal)
+                touchIDButton.setTitle("Disable Touch ID", for: UIControlState.normal)
             } else {
-                touchIDButton.setTitle("Enable TouchID", for: UIControlState.normal)
+                touchIDButton.setTitle("Enable Touch ID", for: UIControlState.normal)
             }
         }
         
@@ -265,9 +265,9 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
     @IBAction func toggleTouchID(toggleButton: UIButton) {
         UserManager.sharedInstance.toggleTouchID()
         if UserManager.sharedInstance.touchIDEnabled {
-            touchIDButton.setTitle("Disable TouchID", for: UIControlState.normal)
+            touchIDButton.setTitle("Disable Touch ID", for: UIControlState.normal)
         } else {
-             touchIDButton.setTitle("Enable TouchID", for: UIControlState.normal)
+             touchIDButton.setTitle("Enable Touch ID", for: UIControlState.normal)
         }
     }
 }

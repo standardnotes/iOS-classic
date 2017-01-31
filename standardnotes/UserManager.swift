@@ -33,7 +33,7 @@ class UserManager {
     var jwt: String!
     
     //#MARK TouchID modifies User default
-    var touchIDEnabled: Bool{
+    var touchIDEnabled: Bool {
         get{
             return UserDefaults.standard.bool(forKey: "touchIDEnabled")
         }
