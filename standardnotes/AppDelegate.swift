@@ -10,11 +10,13 @@ import UIKit
 import CoreData
 import Fabric
 import Crashlytics
+import LocalAuthentication
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    weak var lockOutAlertVC: UIAlertController?
     
     static let sharedContext: NSManagedObjectContext = {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -29,6 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         Theme.Initialize()
         ItemManager.initializeSharedInstance(context: self.persistentContainer.viewContext)
+        attemptFingerPrint()
         return true
     }
 
@@ -40,14 +43,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        if UserManager.sharedInstance.touchIDEnabled {
+            navigateToAccountController(afterDelay: 0)
+        }
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+        attemptFingerPrint()
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        
+        
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
@@ -100,6 +109,66 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
         }
+    }
+    
+    func navigateToAccountController(afterDelay: Double) {
+        // return tab to accounts page
+        delay(afterDelay) {
+            (UIApplication.shared.keyWindow?.rootViewController as? UITabBarController)?.selectedIndex = 1
+        }
+    }
+    
+    func navigateToNotesController(afterDelay: Double) {
+        // return tab to accounts page
+        delay(afterDelay) {
+            (UIApplication.shared.keyWindow?.rootViewController as? UITabBarController)?.selectedIndex = 0
+        }
+    }
+    
+    func attemptFingerPrint(){
+        lockOutAlertVC?.dismiss(animated: false, completion: nil)
+        lockOutAlertVC = nil
+        guard UserManager.sharedInstance.touchIDEnabled else { return }
+        UIApplication.shared.beginIgnoringInteractionEvents()
+        
+        navigateToAccountController(afterDelay: 0.1)
+        
+        let touchIDContext = LAContext()
+        var error : NSError?
+        let reasonString = "Authentication is needed to access your notes."
+        if touchIDContext.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error){
+            touchIDContext.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reasonString, reply: { [weak self] (success, touchIDError) in
+                guard success else {
+                    print(error?.localizedDescription ?? "touch id error")
+                    OperationQueue.main.addOperation {
+                        UIApplication.shared.endIgnoringInteractionEvents()
+                        self?.presentLockAlert()
+                    }
+                    return
+                }
+                UIApplication.shared.endIgnoringInteractionEvents()
+                self?.navigateToNotesController(afterDelay: 0.01)
+            })
+        } else {
+            UIApplication.shared.endIgnoringInteractionEvents()
+            print(error?.localizedDescription ?? "touch id error")
+        }
+        
+    }
+    
+    func presentLockAlert(){
+        guard lockOutAlertVC == nil else {
+            return
+        }
+        let alertController = UIAlertController(title: "Fingerprint Required", message: "Notes are locked with Touch ID. Please try again.", preferredStyle: .alert)
+        let retryTouchIDAction = UIAlertAction(title: "Try Again", style: .default, handler: { [weak self]
+            alert -> Void in
+            self?.attemptFingerPrint()
+        })
+        alertController.addAction(retryTouchIDAction)
+        UIApplication.shared.keyWindow?.rootViewController?.present(alertController, animated: true, completion: nil)
+        lockOutAlertVC = alertController
+        
     }
 
 }
