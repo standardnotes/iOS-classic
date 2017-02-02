@@ -12,7 +12,7 @@ import CoreData
 class NotesViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
-    @IBOutlet weak var searchTextField: UITextField!
+    @IBOutlet weak var searchBar: UISearchBar!
     
     var resultsController: NSFetchedResultsController<Note>!
     var selectedTags = [Tag]()
@@ -63,6 +63,7 @@ class NotesViewController: UIViewController {
             viewDidDisappear = false
                 self.sync()
         }
+        tableView.setContentOffset(CGPoint(x:0,y:-15), animated: false)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -111,7 +112,7 @@ class NotesViewController: UIViewController {
         var predicates = [NSPredicate]()
         
         // handle the case of search text is entered
-        if let searchText = searchTextField.text, searchText != "" {
+        if let searchText = searchBar.text, searchText != "" {
             if selectedTags.count > 0 { // tags also selected
                 var selectedUUIDs = [String]()
                 for tag in selectedTags {
@@ -189,22 +190,30 @@ class NotesViewController: UIViewController {
 /**
    Notes searching functions
  */
-extension NotesViewController {
-    @IBAction func searchNotesDidBeginEditing( textField: UITextField){
+extension NotesViewController: UISearchBarDelegate {
+    
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
         navigationController?.setNavigationBarHidden(true, animated: true)
+        searchBar.showsCancelButton = true
     }
     
-    @IBAction func searchNotesDidEndEditing( textField: UITextField) {
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
         navigationController?.setNavigationBarHidden(false, animated: true)
+        searchBar.showsCancelButton = false
     }
     
-    @IBAction func searchNotesWasEdited( textField: UITextField) {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         reloadResults()
     }
     
-    @IBAction func textFieldDidDone( textField: UITextField) {
-        textField.resignFirstResponder()
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
     }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+    }
+    
 }
 
 extension NotesViewController : UITableViewDelegate, UITableViewDataSource {
