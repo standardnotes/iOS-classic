@@ -43,6 +43,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        if UserManager.sharedInstance.touchIDEnabled {
+            navigateToAccountController(afterDelay: 0)
+        }
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
@@ -108,20 +111,35 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
+    func navigateToAccountController(afterDelay: Double) {
+        // return tab to accounts page
+        delay(afterDelay) {
+            (UIApplication.shared.keyWindow?.rootViewController as? UITabBarController)?.selectedIndex = 1
+        }
+    }
+    
+    func navigateToNotesController(afterDelay: Double) {
+        // return tab to accounts page
+        delay(afterDelay) {
+            (UIApplication.shared.keyWindow?.rootViewController as? UITabBarController)?.selectedIndex = 0
+        }
+    }
+    
     func attemptFingerPrint(){
         lockOutAlertVC?.dismiss(animated: false, completion: nil)
         lockOutAlertVC = nil
         guard UserManager.sharedInstance.touchIDEnabled else { return }
         UIApplication.shared.beginIgnoringInteractionEvents()
-        // return tab to accounts page
-        (UIApplication.shared.keyWindow?.rootViewController as? UITabBarController)?.selectedIndex = 1
+        
+        navigateToAccountController(afterDelay: 0.1)
+        
         let touchIDContext = LAContext()
         var error : NSError?
         let reasonString = "Authentication is needed to access your notes."
         if touchIDContext.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error){
             touchIDContext.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reasonString, reply: { [weak self] (success, touchIDError) in
                 guard success else {
-                    print(error?.localizedDescription ?? "unknown error")
+                    print(error?.localizedDescription ?? "touch id error")
                     OperationQueue.main.addOperation {
                         UIApplication.shared.endIgnoringInteractionEvents()
                         self?.presentLockAlert()
@@ -129,10 +147,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     return
                 }
                 UIApplication.shared.endIgnoringInteractionEvents()
+                self?.navigateToNotesController(afterDelay: 0.01)
             })
         } else {
             UIApplication.shared.endIgnoringInteractionEvents()
-            print(error?.localizedDescription ?? "unknown error")
+            print(error?.localizedDescription ?? "touch id error")
         }
         
     }
@@ -141,7 +160,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         guard lockOutAlertVC == nil else {
             return
         }
-        let alertController = UIAlertController(title: "Locked Out", message: "Notes are locked with touch ID please try again.", preferredStyle: .alert)
+        let alertController = UIAlertController(title: "Fingerprint Required", message: "Notes are locked with Touch ID. Please try again.", preferredStyle: .alert)
         let retryTouchIDAction = UIAlertAction(title: "Try Again", style: .default, handler: { [weak self]
             alert -> Void in
             self?.attemptFingerPrint()

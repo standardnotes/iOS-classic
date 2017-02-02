@@ -20,6 +20,7 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
     @IBOutlet weak var signOutButton: UIButton!
     @IBOutlet weak var exportButton: UIButton!
     @IBOutlet weak var touchIDButton: UIButton!
+    @IBOutlet weak var feedbackButton: UIButton!
     
     var password: String?
     
@@ -59,12 +60,12 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
         let touchIDContext = LAContext()
         self.touchIDButton.isEnabled = touchIDContext.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
         if !touchIDButton.isEnabled {
-            touchIDButton.setTitle("Your phone does not support TouchID", for: UIControlState.normal)
+            touchIDButton.setTitle("Touch ID not available.", for: UIControlState.normal)
         } else {
             if UserManager.sharedInstance.touchIDEnabled {
-                touchIDButton.setTitle("Disable TouchID", for: UIControlState.normal)
+                touchIDButton.setTitle("Disable Touch ID", for: UIControlState.normal)
             } else {
-                touchIDButton.setTitle("Enable TouchID", for: UIControlState.normal)
+                touchIDButton.setTitle("Enable Touch ID", for: UIControlState.normal)
             }
         }
         
@@ -234,6 +235,17 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
         self.present(mailComposer, animated: true, completion: nil)
     }
     
+    func showFeedbackComposer() {
+        let versionNumber = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
+        let buildNumber = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as! String
+        
+        let mailComposer = MFMailComposeViewController()
+        mailComposer.mailComposeDelegate = self
+        mailComposer.setSubject("Feedback on iOS app (v\(versionNumber).\(buildNumber))")
+        mailComposer.setToRecipients(["standardnotes@bitar.io"])
+        self.present(mailComposer, animated: true, completion: nil)
+    }
+    
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
         self.dismiss(animated: true, completion: nil)
     }
@@ -261,13 +273,20 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
         }
     }
     
+    @IBAction func feedbackPressed(_ sender: Any) {
+        if(!MFMailComposeViewController.canSendMail() ) {
+            self.showAlert(title: "Oops", message: "Your device cannot send email. Please send feedback to standardnotes@bitar.io.")
+            return
+        }
+        showFeedbackComposer()
+    }
     
     @IBAction func toggleTouchID(toggleButton: UIButton) {
         UserManager.sharedInstance.toggleTouchID()
         if UserManager.sharedInstance.touchIDEnabled {
-            touchIDButton.setTitle("Disable TouchID", for: UIControlState.normal)
+            touchIDButton.setTitle("Disable Touch ID", for: UIControlState.normal)
         } else {
-             touchIDButton.setTitle("Enable TouchID", for: UIControlState.normal)
+             touchIDButton.setTitle("Enable Touch ID", for: UIControlState.normal)
         }
     }
 }

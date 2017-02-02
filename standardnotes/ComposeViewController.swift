@@ -73,12 +73,12 @@ class ComposeViewController: UIViewController {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: tagsTitle, style: .plain, target: self, action: #selector(tagsPressed))
     }
     
-    func reloadTitle() {
-        let subtitleAttribute = [NSForegroundColorAttributeName: UIColor.gray , NSFontAttributeName: UIFont.systemFont(ofSize: 12.0)]
+    func reloadTitle(offline: Bool) {
         let titleString = NSMutableAttributedString(string: "Compose" + (saving || saved ? "\n" : ""), attributes: [NSFontAttributeName: UIFont.boldSystemFont(ofSize: 17.0)])
         
         if saving || saved {
-            let string = saving ? "Saving..." : "All changes saved"
+            let subtitleAttribute = [NSForegroundColorAttributeName: offline ? UIColor.red : UIColor.gray , NSFontAttributeName: UIFont.systemFont(ofSize: 12.0)]
+            let string = offline ? "Offline" : (saving ? "Saving..." : "All changes saved")
             let subtitleString = NSAttributedString(string: string, attributes: subtitleAttribute)
             titleString.append(subtitleString)
         }
@@ -109,28 +109,36 @@ class ComposeViewController: UIViewController {
             self.configureNavBar()
             self.save()
         }
-//        let nav = UINavigationController(rootViewController: tags)
-//        self.present(nav, animated: true, completion: nil)
+
         self.navigationController?.pushViewController(tags, animated: true)
     }
+    
+    var didShowErrorAlert: Bool = false
 
     func save() {
         saving = true
         saved = false
-        reloadTitle()
+        reloadTitle(offline: false)
         self.note.title = self.titleTextField.text
         self.note.text = self.textView.text
         self.note.draft = false
         self.note.dirty = true
         ApiController.sharedInstance.sync { error in
+            self.saving = false
+            self.saved = true
+
             if error == nil {
-                delay(0.2, closure: {
-                    self.saving = false
-                    self.saved = true
-                    self.reloadTitle()
+                delay(0.1, closure: {
+                    self.reloadTitle(offline: false)
                 })
             } else {
-                self.showAlert(title: "Oops", message: "There was an error saving your data to the server. Please check your server settings and try again.")
+                delay(0.2, closure: {
+                    self.reloadTitle(offline: true)
+                })
+                if(!self.didShowErrorAlert) {
+                    self.showAlert(title: "Oops", message: "There was an error saving your data to the server. Please check your server settings and try again.")
+                    self.didShowErrorAlert = true
+                }
             }
         }
     }
