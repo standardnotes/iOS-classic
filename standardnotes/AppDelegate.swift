@@ -16,6 +16,8 @@ import LocalAuthentication
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    var syncTimer : Timer?
+    let syncTimeInterval : TimeInterval = 30
     weak var lockOutAlertVC: UIAlertController?
     
     static let sharedContext: NSManagedObjectContext = {
@@ -32,6 +34,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Theme.Initialize()
         ItemManager.initializeSharedInstance(context: self.persistentContainer.viewContext)
         attemptFingerPrint()
+        startSyncTimer()
         return true
     }
 
@@ -46,11 +49,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if UserManager.sharedInstance.touchIDEnabled {
             navigateToAccountController(afterDelay: 0)
         }
+        stopSyncTimer()
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
         attemptFingerPrint()
+        startSyncTimer()
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -123,6 +128,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         delay(afterDelay) {
             (UIApplication.shared.keyWindow?.rootViewController as? UITabBarController)?.selectedIndex = 0
         }
+    }
+    
+    func startSyncTimer() {
+        syncTimer?.invalidate()
+        syncTimer = Timer.scheduledTimer(withTimeInterval: syncTimeInterval, repeats: true, block: { (timer) in
+            ApiController.sharedInstance.sync(completion: { (error) in})
+        })
+    }
+    
+    func stopSyncTimer() {
+        syncTimer?.invalidate()
     }
     
     func attemptFingerPrint(){
