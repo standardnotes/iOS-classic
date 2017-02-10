@@ -15,14 +15,18 @@ class SyncController {
     var syncTimer : Timer?
     let syncTimeInterval : TimeInterval = 30
     
-    func startSyncTimer() {
+    func startSyncing() {
         syncTimer?.invalidate()
         syncTimer = Timer.scheduledTimer(withTimeInterval: syncTimeInterval, repeats: true, block: { (timer) in
-            ApiController.sharedInstance.sync(completion: { (error) in})
+            self.performSync()
         })
     }
     
-    func stopSyncTimer() {
+    func performSync() {
+        ApiController.sharedInstance.sync(completion: { (error) in})
+    }
+    
+    func stopSyncing() {
         syncTimer?.invalidate()
     }
 }
