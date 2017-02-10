@@ -63,11 +63,11 @@ class Crypto {
         return String(data: data, encoding: .utf8)!
     }
     
-    func decrypt(message base64String: String, hexKey: String) -> String {
+    func decrypt(message base64String: String, hexKey: String) -> String? {
         let base64Data = Data(base64Encoded: base64String)
         let resultData = AES128CBC("decrypt", base64Data, hexKey.toHexadecimalData())
         let resultString = String(data: resultData!, encoding: .utf8)
-        return resultString!
+        return resultString
     }
     
     func encrypt(message plainTextMessage: String, key hexKey: String) -> String {
@@ -76,16 +76,19 @@ class Crypto {
         return base64String
     }
     
-    func encryptionParams(forItem item: Item) -> [String : String] {
+    func encryptionParams(forItem item: Item) -> [String : String]? {
         var params = [String : String]()
         let message = item.createContentJSONFromProperties().rawString()!
         if item.encItemKey == nil {
             setKey(forItem: item)
         }
         let keys = itemKeys(fromEncryptedKey: item.encItemKey!)
-        params["content"] = "001" + encrypt(message: message, key: keys["ek"]!)
+        if(keys == nil) {
+            return nil
+        }
+        params["content"] = "001" + encrypt(message: message, key: keys!["ek"]!)
         params["enc_item_key"] = item.encItemKey!
-        params["auth_hash"] = authHashString(encryptedContent: params["content"]!, authKey: keys["ak"]!)
+        params["auth_hash"] = authHashString(encryptedContent: params["content"]!, authKey: keys!["ak"]!)
         return params
     }
     
@@ -111,10 +114,13 @@ class Crypto {
         item.encItemKey = encrypt(message: hex, key: UserManager.sharedInstance.mk)
     }
     
-    func itemKeys(fromEncryptedKey key: String) -> [String : String] {
+    func itemKeys(fromEncryptedKey key: String) -> [String : String]? {
         let item_key = decrypt(message: key, hexKey: UserManager.sharedInstance.mk)
-        let ek = item_key.firstHalf()
-        let ak = item_key.secondHalf()
+        if(item_key == nil) {
+            return nil
+        }
+        let ek = item_key!.firstHalf()
+        let ak = item_key!.secondHalf()
         return ["ek" : ek, "ak" : ak]
     }
     
@@ -127,14 +133,19 @@ class Crypto {
             }
             
             if item["content"].string?.substring(to: 3) == "001", let enc_key = item["enc_item_key"].string {
+            
                 let keys = itemKeys(fromEncryptedKey: enc_key)
-                let ek = keys["ek"]!
-                let ak = keys["ak"]!
+                if(keys == nil) {
+                    print("Error decrypting item, continuing.")
+                    continue
+                }
+                let ek = keys!["ek"]!
+                let ak = keys!["ak"]!
                 
                 let content = item["content"].string!
                 let contentData = content.data(using: .utf8)!
                 let akHexData = ak.toHexadecimalData()!
-
+                
                 let computedData = HMAC256(contentData, akHexData)
                 let authHash = computedData!.hexEncodedString()
                 if(authHash != item["auth_hash"].string!) {
@@ -144,7 +155,9 @@ class Crypto {
                 
                 let contentToDecrypt = item["content"].string!.substring(from: 3)
                 let decryptedContent = decrypt(message: contentToDecrypt, hexKey: ek)
-                items[index]["content"] = JSON(decryptedContent)
+                if(decryptedContent != nil) {
+                    items[index]["content"] = JSON(decryptedContent!)
+                }
             } else {
                 if let contentToDecode = item["content"].string?.substring(from: 3) {
                     items[index]["content"] = JSON(Crypto.sharedInstance.base64decode(base64String: contentToDecode))
