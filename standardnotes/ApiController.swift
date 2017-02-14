@@ -206,7 +206,9 @@ class ApiController {
         if(encrypted) {
             // send encrypted
             let encryptedParams = Crypto.sharedInstance.encryptionParams(forItem: item)
-            params.merge(with: encryptedParams)
+            if(encryptedParams != nil) {
+                params.merge(with: encryptedParams!)
+            }
         } else {
             // send decrypted
             params["enc_item_key"] = NSNull()

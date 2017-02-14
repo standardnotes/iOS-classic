@@ -99,10 +99,7 @@ class NotesViewController: UIViewController {
     
     func presentComposer(note: Note?) {
         let compose = self.storyboard?.instantiateViewController(withIdentifier: "Compose") as! ComposeViewController
-        compose.note = note
-//        let navController = UINavigationController(rootViewController: compose)
-//        self.present(navController, animated: true, completion: nil)
-        
+        compose.note = note        
         self.navigationController?.pushViewController(compose, animated: true)
     }
     
