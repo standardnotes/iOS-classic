@@ -63,9 +63,11 @@ class NotesViewController: UIViewController {
             viewDidDisappear = false
                 self.sync()
         }
-        tableView.setContentOffset(CGPoint(x:0,y:-15), animated: false)
     }
-    
+    override func viewDidAppear(_ animated: Bool) {
+        tableView.setContentOffset(CGPoint(x:0, y:-15), animated: false)
+    }
+
     override func viewWillDisappear(_ animated: Bool) {
         viewDidDisappear = true
     }
