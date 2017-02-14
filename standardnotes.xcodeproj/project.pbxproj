@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6928F05B1E45F7A300A05DB9 /* SyncController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6928F05A1E45F7A300A05DB9 /* SyncController.swift */; };
 		B8046A731E2A8074006A5F03 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8046A721E2A8074006A5F03 /* Theme.swift */; };
 		B809F2B81E0B5164007D5700 /* ComposeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B809F2B71E0B5164007D5700 /* ComposeViewController.swift */; };
 		B82B6DFB1E08AA660025C3EC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B82B6DFA1E08AA660025C3EC /* AppDelegate.swift */; };
@@ -113,6 +114,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		6928F05A1E45F7A300A05DB9 /* SyncController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncController.swift; sourceTree = "<group>"; };
 		B8046A721E2A8074006A5F03 /* Theme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		B809F2B71E0B5164007D5700 /* ComposeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComposeViewController.swift; sourceTree = "<group>"; };
 		B82B6DF71E08AA660025C3EC /* standardnotes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = standardnotes.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -285,6 +287,7 @@
 			isa = PBXGroup;
 			children = (
 				B82B6E171E08AC8C0025C3EC /* ApiController.swift */,
+				6928F05A1E45F7A300A05DB9 /* SyncController.swift */,
 				B878C4B11E09ADF6002A876F /* Crypto.swift */,
 				B878C49F1E09A1DD002A876F /* ItemManager.swift */,
 				B89178DF1E0D84C200163EA7 /* UserManager.swift */,
@@ -454,6 +457,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6928F05B1E45F7A300A05DB9 /* SyncController.swift in Sources */,
 				B82B6E031E08AA660025C3EC /* standardnotes.xcdatamodeld in Sources */,
 				B82B6DFD1E08AA660025C3EC /* NotesViewController.swift in Sources */,
 				B89178DE1E0D7D8300163EA7 /* AccountViewController.swift in Sources */,

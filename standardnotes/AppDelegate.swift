@@ -32,6 +32,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Theme.Initialize()
         ItemManager.initializeSharedInstance(context: self.persistentContainer.viewContext)
         attemptFingerPrint()
+        SyncController.sharedInstance.startSyncing()
         return true
     }
 
@@ -46,11 +47,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if UserManager.sharedInstance.touchIDEnabled {
             navigateToAccountController(afterDelay: 0)
         }
+        SyncController.sharedInstance.stopSyncing()
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
         attemptFingerPrint()
+        SyncController.sharedInstance.startSyncing()
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {

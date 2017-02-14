@@ -23,7 +23,7 @@ class ComposeViewController: UIViewController {
         self.automaticallyAdjustsScrollViewInsets = false
         
         textView.layoutManager.delegate = self
-        textView.textContainerInset = UIEdgeInsetsMake(12, 12, 0, 12)
+        textView.textContainerInset = UIEdgeInsetsMake(12, 12, 12, 12)
 
         configureNote()
         configureNavBar()
@@ -40,7 +40,7 @@ class ComposeViewController: UIViewController {
     
     func keyboardWasShown(aNotification:NSNotification) {
         let info = aNotification.userInfo
-        let infoNSValue = info![UIKeyboardFrameBeginUserInfoKey] as! NSValue
+        let infoNSValue = info![UIKeyboardFrameEndUserInfoKey] as! NSValue
         let kbSize = infoNSValue.cgRectValue.size
         let contentInsets = UIEdgeInsetsMake(0.0, 0.0, kbSize.height, 0.0)
         textView.contentInset = contentInsets
