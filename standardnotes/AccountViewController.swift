@@ -167,7 +167,7 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
     }
     
     func showPasswordConfirmationAlert(completion: @escaping (String?) -> ()) {
-        let alertController = UIAlertController(title: "Confirm Password", message: "Note that because your notes are encrypted on your device using your password, Standard Notes does not have a password reset option. You can not forget your password.", preferredStyle: .alert)
+        let alertController = UIAlertController(title: "Confirm Password", message: "Note that because your notes are encrypted on your device using your password, Standard Notes does not have a password reset option. You cannot forget your password.", preferredStyle: .alert)
         
         let saveAction = UIAlertAction(title: "Confirm", style: .default, handler: {
             alert -> Void in
