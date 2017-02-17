@@ -58,20 +58,22 @@ class Crypto {
         return message.data(using: .utf8)!.base64EncodedString()
     }
     
-    func base64decode(base64String: String) -> String {
-        let data = Data(base64Encoded: base64String)!
+    func base64decode(base64String: String) -> String? {
+        guard let data = Data(base64Encoded: base64String) else {
+            return nil
+        }
         return String(data: data, encoding: .utf8)!
     }
     
-    func decrypt(message base64String: String, hexKey: String) -> String? {
+    func decrypt(message base64String: String, hexKey: String, iv hexIV: String?) -> String? {
         let base64Data = Data(base64Encoded: base64String)
-        let resultData = AES128CBC("decrypt", base64Data, hexKey.toHexadecimalData())
+        let resultData = AES128CBC("decrypt", base64Data, hexKey.toHexadecimalData(), hexIV?.toHexadecimalData())
         let resultString = String(data: resultData!, encoding: .utf8)
         return resultString
     }
     
-    func encrypt(message plainTextMessage: String, key hexKey: String) -> String {
-        let resultData = AES128CBC("encrypt", plainTextMessage.data(using: .utf8), hexKey.toHexadecimalData())
+    func encrypt(message plainTextMessage: String, key hexKey: String, iv hexIV: String?) -> String {
+        let resultData = AES128CBC("encrypt", plainTextMessage.data(using: .utf8), hexKey.toHexadecimalData(), hexIV?.toHexadecimalData())
         let base64String = resultData!.base64EncodedString()
         return base64String
     }
@@ -86,7 +88,7 @@ class Crypto {
         if(keys == nil) {
             return nil
         }
-        params["content"] = "001" + encrypt(message: message, key: keys!["ek"]!)
+        params["content"] = "001" + encrypt(message: message, key: keys!["ek"]!, iv: nil)
         params["enc_item_key"] = item.encItemKey!
         params["auth_hash"] = authHashString(encryptedContent: params["content"]!, authKey: keys!["ak"]!)
         return params
@@ -111,11 +113,11 @@ class Crypto {
         // key required to be 512 bits
         let hex = generateRandomHexKey(size: 512)
         // encrypt key with master key
-        item.encItemKey = encrypt(message: hex, key: UserManager.sharedInstance.mk)
+        item.encItemKey = encrypt(message: hex, key: UserManager.sharedInstance.mk, iv: nil)
     }
     
     func itemKeys(fromEncryptedKey key: String) -> [String : String]? {
-        let item_key = decrypt(message: key, hexKey: UserManager.sharedInstance.mk)
+        let item_key = decrypt(message: key, hexKey: UserManager.sharedInstance.mk, iv: nil)
         if(item_key == nil) {
             return nil
         }
@@ -154,19 +156,19 @@ class Crypto {
                 }
                 
                 let contentToDecrypt = item["content"].string!.substring(from: 3)
-                let decryptedContent = decrypt(message: contentToDecrypt, hexKey: ek)
+                let decryptedContent = decrypt(message: contentToDecrypt, hexKey: ek, iv: nil)
                 if(decryptedContent != nil) {
                     items[index]["content"] = JSON(decryptedContent!)
                 }
             } else {
                 if let contentToDecode = item["content"].string?.substring(from: 3) {
-                    items[index]["content"] = JSON(Crypto.sharedInstance.base64decode(base64String: contentToDecode))
+                    if let decoded = Crypto.sharedInstance.base64decode(base64String: contentToDecode) {
+                        items[index]["content"] = JSON(decoded)
+                    }
                 }
             }
         }
     }
-
-
 }
 
 extension String {
