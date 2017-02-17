@@ -36,7 +36,7 @@ class TagsViewController: UIViewController {
     
     func configureNavBar() {
         if self.isModal {
-            self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Dismiss", style: .plain, target: self, action: #selector(donePressed))
+            self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Dismiss", style: .done, target: self, action: #selector(donePressed))
         }
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New", style: .plain, target: self, action: #selector(newTagPressed))
     }
