@@ -9,7 +9,7 @@
 #import "NSData+Crypto.h"
 #import <CommonCrypto/CommonCrypto.h>
 
-extern NSData * AES128CBC(NSString *op, NSData * data, NSData * key) {
+extern NSData * AES128CBC(NSString *op, NSData * data, NSData * key, NSData *iv) {
     CCCryptorStatus    err;
     NSMutableData *    result;
     size_t              resultLength;
@@ -31,7 +31,7 @@ extern NSData * AES128CBC(NSString *op, NSData * data, NSData * key) {
                   kCCAlgorithmAES128,
                   kCCOptionPKCS7Padding,
                   key.bytes, key.length,
-                  nil,
+                  iv.bytes,
                   data.bytes, data.length,
                   result.mutableBytes,  result.length,
                   &resultLength
