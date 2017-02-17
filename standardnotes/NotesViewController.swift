@@ -58,18 +58,28 @@ class NotesViewController: UIViewController {
     var viewDidDisappear = false
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         refreshItems()
         if viewDidDisappear {
             viewDidDisappear = false
                 self.sync()
         }
     }
-    override func viewDidAppear(_ animated: Bool) {
-        tableView.setContentOffset(CGPoint(x:0, y:-15), animated: false)
-    }
 
     override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(true)
         viewDidDisappear = true
+    }
+    
+    var didHideSearchBar = false
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if(!didHideSearchBar) {
+            tableView.setContentOffset(CGPoint(x:0, y:-self.searchBar.frame.size.height/2 + 2), animated: false)
+            didHideSearchBar = true
+        }
     }
     
     func refreshItems() {
