@@ -119,9 +119,14 @@ class NotesViewController: UIViewController {
     }
     
     func presentComposer(note: Note?) {
-        let compose = self.storyboard?.instantiateViewController(withIdentifier: "Compose") as! ComposeViewController
-        compose.note = note        
-        self.navigationController?.pushViewController(compose, animated: true)
+        let tabBar = self.storyboard?.instantiateViewController(withIdentifier: "Compose") as! UITabBarController
+        if let compose = tabBar.viewControllers?[0] as? ComposeViewController {
+            compose.note = note
+        }
+        if let markDown = tabBar.viewControllers?[1] as? MarkDownViewController {
+            markDown.note = note
+        }
+        self.navigationController?.pushViewController(tabBar, animated: true)
     }
     
     func reloadResults() {

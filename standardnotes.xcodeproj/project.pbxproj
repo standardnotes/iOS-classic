@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		6928F05B1E45F7A300A05DB9 /* SyncController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6928F05A1E45F7A300A05DB9 /* SyncController.swift */; };
+		69462FFE1E5C53A30097EBE8 /* Markdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69462FFD1E5C53A30097EBE8 /* Markdown.swift */; };
+		694630141E5C59060097EBE8 /* MarkDownViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694630131E5C59060097EBE8 /* MarkDownViewController.swift */; };
 		B8046A731E2A8074006A5F03 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8046A721E2A8074006A5F03 /* Theme.swift */; };
 		B809F2B81E0B5164007D5700 /* ComposeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B809F2B71E0B5164007D5700 /* ComposeViewController.swift */; };
 		B82B6DFB1E08AA660025C3EC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B82B6DFA1E08AA660025C3EC /* AppDelegate.swift */; };
@@ -113,6 +115,8 @@
 
 /* Begin PBXFileReference section */
 		6928F05A1E45F7A300A05DB9 /* SyncController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncController.swift; sourceTree = "<group>"; };
+		69462FFD1E5C53A30097EBE8 /* Markdown.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Markdown.swift; path = ../../standardNotes/standardnotes/Markdown.swift; sourceTree = "<group>"; };
+		694630131E5C59060097EBE8 /* MarkDownViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarkDownViewController.swift; sourceTree = "<group>"; };
 		B8046A721E2A8074006A5F03 /* Theme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		B809F2B71E0B5164007D5700 /* ComposeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComposeViewController.swift; sourceTree = "<group>"; };
 		B82B6DF71E08AA660025C3EC /* standardnotes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = standardnotes.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -158,6 +162,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6946300B1E5C58D80097EBE8 /* Markdown */ = {
+			isa = PBXGroup;
+			children = (
+				694630131E5C59060097EBE8 /* MarkDownViewController.swift */,
+			);
+			name = Markdown;
+			sourceTree = "<group>";
+		};
 		B80140921E12FFA00046082C /* Compose */ = {
 			isa = PBXGroup;
 			children = (
@@ -173,6 +185,7 @@
 				B89178E51E0DBDC800163EA7 /* Notes */,
 				B89178E61E0DC80600163EA7 /* Tags */,
 				B80140921E12FFA00046082C /* Compose */,
+				6946300B1E5C58D80097EBE8 /* Markdown */,
 				B89178E11E0D86D500163EA7 /* TabBarViewController.swift */,
 				B89178DD1E0D7D8300163EA7 /* AccountViewController.swift */,
 			);
@@ -290,6 +303,7 @@
 		CDAAB6421E0DE4DE0033487A /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				69462FFD1E5C53A30097EBE8 /* Markdown.swift */,
 				B872EC871E08D00400CC7656 /* standardnotes-Bridging-Header.h */,
 				B82B6E041E08AA660025C3EC /* Assets.xcassets */,
 				B82B6E061E08AA660025C3EC /* LaunchScreen.storyboard */,
@@ -438,6 +452,8 @@
 				B89178DE1E0D7D8300163EA7 /* AccountViewController.swift in Sources */,
 				B8046A731E2A8074006A5F03 /* Theme.swift in Sources */,
 				B89178DA1E0C9B9D00163EA7 /* Tag+CoreDataProperties.swift in Sources */,
+				69462FFE1E5C53A30097EBE8 /* Markdown.swift in Sources */,
+				694630141E5C59060097EBE8 /* MarkDownViewController.swift in Sources */,
 				B89178E81E0DC81500163EA7 /* TagTableViewCell.swift in Sources */,
 				B89178CE1E0C9A4D00163EA7 /* Tag+CoreDataClass.swift in Sources */,
 				B82B6E181E08AC8C0025C3EC /* ApiController.swift in Sources */,
