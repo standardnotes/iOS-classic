@@ -16,6 +16,7 @@ class ComposeViewController: UIViewController {
     var note: Note!
     var saving: Bool = false
     var saved: Bool = false
+    fileprivate var observsersAdded = false
     var saveTimer: Timer!
         
     override func viewDidLoad() {
@@ -32,8 +33,21 @@ class ComposeViewController: UIViewController {
         titleTextField.text = self.note?.safeTitle()
         textView.text = self.note?.safeText()
         
-        self.note.addObserver(self, forKeyPath: "text", options: [.new], context: nil)
-        self.note.addObserver(self, forKeyPath: "title", options: [.new], context: nil)
+        addObservers()
+    }
+    
+    func addObservers() {
+        guard !observsersAdded else { return }
+        observsersAdded = true
+        note.addObserver(self, forKeyPath: "text", options: [.new], context: nil)
+        note.addObserver(self, forKeyPath: "title", options: [.new], context: nil)
+    }
+    
+    func removeObservsers() {
+        guard observsersAdded else { return }
+        observsersAdded = false
+        note.removeObserver(self, forKeyPath: "text")
+        note.removeObserver(self, forKeyPath: "title")
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
@@ -45,8 +59,7 @@ class ComposeViewController: UIViewController {
     }
     
     deinit {
-        self.note.removeObserver(self, forKeyPath: "text")
-        self.note.removeObserver(self, forKeyPath: "title")
+        removeObservsers()
     }
     
     func configureKeyboardNotifications() {
@@ -82,14 +95,30 @@ class ComposeViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        configureNavBar()
     }
     
     func configureNavBar() {
         let tagsTitle = note.tags!.count > 0 ? "Tags (\(note.tags!.count))" : "Tags"
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: tagsTitle, style: .plain, target: self, action: #selector(tagsPressed))
+        
+        tabBarController?.navigationItem.rightBarButtonItem = UIBarButtonItem(title: tagsTitle, style: .plain, target: self, action: #selector(tagsPressed))
+        
+        guard let tabBarController = tabBarController, tabBarController.selectedIndex == 0 else { return }
+        let title = "Compose"
+        let size = title.size(attributes: navigationController?.navigationBar.titleTextAttributes)
+        let rectForTitleLabel = CGRect(origin: CGPoint.zero, size: size)
+        let titleLabel = UILabel(frame: rectForTitleLabel)
+        titleLabel.attributedText = NSAttributedString(string: title, attributes: navigationController?.navigationBar.titleTextAttributes)
+        titleLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(navBarTitleTapped(tapGesture:))))
+        titleLabel.isUserInteractionEnabled = true
+        tabBarController.navigationItem.titleView = titleLabel
     }
     
+    
+    
     func reloadTitle(offline: Bool) {
+        // make sure this VC is the one presented before modifying the title because it could be that the markdown view is presented
+        guard let tabBarController = tabBarController, tabBarController.selectedIndex == 0 else { return }
         let titleString = NSMutableAttributedString(string: "Compose" + (saving || saved ? "\n" : ""), attributes: [NSFontAttributeName: UIFont.boldSystemFont(ofSize: 17.0)])
         
         if saving || saved {
@@ -103,7 +132,9 @@ class ComposeViewController: UIViewController {
         label.numberOfLines = 0
         label.textAlignment = NSTextAlignment.center
         label.attributedText = titleString
-        self.navigationItem.titleView = label
+        label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(navBarTitleTapped(tapGesture:))))
+        label.isUserInteractionEnabled = true
+        tabBarController.navigationItem.titleView = label
     }
     
     let NoteTitlePlaceholder = ""
@@ -120,10 +151,10 @@ class ComposeViewController: UIViewController {
     func tagsPressed() {
         let tags = self.storyboard?.instantiateViewController(withIdentifier: "Tags") as! TagsViewController
         tags.setInitialSelectedTags(tags: self.note.tags?.allObjects as! [Tag])
-        tags.selectionCompletion = { tags in
-            self.note.replaceTags(withTags: tags)
-            self.configureNavBar()
-            self.save()
+        tags.selectionCompletion = { [weak self] tags in
+            self?.note.replaceTags(withTags: tags)
+            self?.configureNavBar()
+            self?.save()
         }
 
         self.navigationController?.pushViewController(tags, animated: true)
@@ -162,6 +193,11 @@ class ComposeViewController: UIViewController {
     @IBAction func titleFieldEditingChanged(_ sender: Any) {
         beginSaveTimer()
     }
+    
+    func navBarTitleTapped(tapGesture: UITapGestureRecognizer) {
+        tabBarController?.selectedIndex = 1
+    }
+ 
     
 }
 

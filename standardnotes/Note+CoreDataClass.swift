@@ -52,7 +52,6 @@ public class Note: Item {
         for newTag in tags {
             newTag.dirty = true
         }
-        
         self.removeFromTags(self.tags!)
         self.addToTags(NSSet(array: tags))
     }
