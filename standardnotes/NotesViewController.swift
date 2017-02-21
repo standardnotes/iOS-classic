@@ -12,6 +12,7 @@ import CoreData
 class NotesViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
+    var searchBar: UISearchBar!
     
     var resultsController: NSFetchedResultsController<Note>!
     var selectedTags = [Tag]()
@@ -33,6 +34,11 @@ class NotesViewController: UIViewController {
         NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: UserManager.LogoutNotification), object: nil, queue: OperationQueue.main) { (notification) in
             self.reloadResults()
         }
+        
+        // search bar loading triggers resultsController for some reason, so it must be done at the end
+        searchBar = UISearchBar(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 44))
+        searchBar.delegate = self
+        tableView.tableHeaderView = self.searchBar
     }
     
     func configureTableView() {
@@ -57,15 +63,32 @@ class NotesViewController: UIViewController {
     var viewDidDisappear = false
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         refreshItems()
         if viewDidDisappear {
             viewDidDisappear = false
                 self.sync()
         }
+        
+        if(!didHideSearchBar) {
+            tableView.setContentOffset(CGPoint(x:0, y:self.searchBar.frame.size.height), animated: false)
+            didHideSearchBar = true
+        }
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(true)
+        viewDidDisappear = true
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        viewDidDisappear = true
+    var didHideSearchBar = false
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+    }
+    
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
     }
     
     func refreshItems() {
@@ -104,17 +127,36 @@ class NotesViewController: UIViewController {
     func reloadResults() {
         let fetchRequest = NSFetchRequest<Note>(entityName: "Note")
         fetchRequest.predicate = NSPredicate(format: "draft == false")
-        if selectedTags.count > 0 {
-            var predicates = [NSPredicate]()
+        var predicates = [NSPredicate]()
+        
+        // handle the case of search text is entered
+        if searchBar != nil, let searchText = searchBar.text, searchText != "" {
+            if selectedTags.count > 0 { // tags also selected
+                var selectedUUIDs = [String]()
+                for tag in selectedTags {
+                    selectedUUIDs += [tag.uuid]
+                }
+                let searchPredicate = NSPredicate(format: "(ANY tags.uuid in %@) AND ((title contains[cd] %@) OR (text contains[cd] %@) OR (tags.title contains %@))",selectedUUIDs,searchText,searchText,searchText)
+                predicates.append(searchPredicate)
+            } else {
+                let searchPredicate = NSPredicate(format: "(title contains[cd] %@) OR (text contains[cd] %@) OR (tags.title contains[cd] %@)",searchText,searchText,searchText)
+                predicates.append(searchPredicate)
+            }
+        } else { // handle tags
             for tag in selectedTags {
                 let tagPredicate = NSPredicate(format: "ANY tags.uuid == %@", tag.uuid)
                 predicates.append(tagPredicate)
             }
-            let tagPredicate = NSCompoundPredicate(orPredicateWithSubpredicates: predicates)
-            fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [fetchRequest.predicate!, tagPredicate])
         }
+        
         let sort = NSSortDescriptor(key: "createdAt", ascending: false)
         fetchRequest.sortDescriptors = [sort]
+        
+        if predicates.count > 0 {
+            let searchPredicates = NSCompoundPredicate(orPredicateWithSubpredicates: predicates)
+            fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [fetchRequest.predicate!, searchPredicates])
+        }
+        
         resultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: AppDelegate.sharedContext, sectionNameKeyPath: nil, cacheName: nil)
     
         resultsController.delegate = self
@@ -161,6 +203,35 @@ class NotesViewController: UIViewController {
             }
         }
     }
+}
+
+/**
+   Notes searching functions
+ */
+extension NotesViewController: UISearchBarDelegate {
+
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        navigationController?.setNavigationBarHidden(true, animated: true)
+        searchBar.showsCancelButton = true
+    }
+    
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        navigationController?.setNavigationBarHidden(false, animated: true)
+        searchBar.showsCancelButton = false
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        reloadResults()
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+    }
+    
 }
 
 extension NotesViewController : UITableViewDelegate, UITableViewDataSource {

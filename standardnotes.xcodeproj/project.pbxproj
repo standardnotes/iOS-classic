@@ -35,8 +35,6 @@
 		B89178E21E0D86D500163EA7 /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89178E11E0D86D500163EA7 /* TabBarViewController.swift */; };
 		B89178E41E0DBDC500163EA7 /* NoteTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89178E31E0DBDC500163EA7 /* NoteTableViewCell.swift */; };
 		B89178E81E0DC81500163EA7 /* TagTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89178E71E0DC81500163EA7 /* TagTableViewCell.swift */; };
-		B8AD67A31E23FE8300EC1F7C /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8AD67A11E23FE8300EC1F7C /* Crashlytics.framework */; };
-		B8AD67A41E23FE8300EC1F7C /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8AD67A21E23FE8300EC1F7C /* Fabric.framework */; };
 		CDAAB63F1E0DE3B30033487A /* ViewController+Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDAAB63E1E0DE3B30033487A /* ViewController+Util.swift */; };
 /* End PBXBuildFile section */
 
@@ -145,8 +143,6 @@
 		B89178E11E0D86D500163EA7 /* TabBarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
 		B89178E31E0DBDC500163EA7 /* NoteTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoteTableViewCell.swift; sourceTree = "<group>"; };
 		B89178E71E0DC81500163EA7 /* TagTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TagTableViewCell.swift; sourceTree = "<group>"; };
-		B8AD67A11E23FE8300EC1F7C /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
-		B8AD67A21E23FE8300EC1F7C /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
 		CDAAB63E1E0DE3B30033487A /* ViewController+Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ViewController+Util.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -155,9 +151,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B8AD67A31E23FE8300EC1F7C /* Crashlytics.framework in Frameworks */,
 				B82B6E391E08BC550025C3EC /* Alamofire.framework in Frameworks */,
-				B8AD67A41E23FE8300EC1F7C /* Fabric.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -188,8 +182,6 @@
 		B82B6DEE1E08AA660025C3EC = {
 			isa = PBXGroup;
 			children = (
-				B8AD67A11E23FE8300EC1F7C /* Crashlytics.framework */,
-				B8AD67A21E23FE8300EC1F7C /* Fabric.framework */,
 				B82B6DF91E08AA660025C3EC /* standardnotes */,
 				B82B6DF81E08AA660025C3EC /* Products */,
 			);
@@ -317,7 +309,6 @@
 				B82B6DF41E08AA660025C3EC /* Frameworks */,
 				B82B6DF51E08AA660025C3EC /* Resources */,
 				B82B6E3D1E08BC550025C3EC /* Embed Frameworks */,
-				B8AD67AC1E23FE9600EC1F7C /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -435,22 +426,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		B8AD67AC1E23FE9600EC1F7C /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PROJECT_DIR}/Fabric.framework/run\" 8319c8edfee00a76bda2249164ef0dcea3a9a670 697fc034a44a422d9941edbd18af2701f8e263ae6910147debe4ef072b38ea6d";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		B82B6DF31E08AA660025C3EC /* Sources */ = {

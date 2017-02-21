@@ -31,6 +31,22 @@ class ComposeViewController: UIViewController {
         
         titleTextField.text = self.note?.safeTitle()
         textView.text = self.note?.safeText()
+        
+        self.note.addObserver(self, forKeyPath: "text", options: [.new], context: nil)
+        self.note.addObserver(self, forKeyPath: "title", options: [.new], context: nil)
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if(keyPath == "text") {
+            textView.text = (object as! Note).safeText()
+        } else if(keyPath == "title") {
+            titleTextField.text = (object as! Note).safeTitle()
+        }
+    }
+    
+    deinit {
+        self.note.removeObserver(self, forKeyPath: "text")
+        self.note.removeObserver(self, forKeyPath: "title")
     }
     
     func configureKeyboardNotifications() {
