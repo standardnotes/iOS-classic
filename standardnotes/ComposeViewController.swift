@@ -17,6 +17,7 @@ class ComposeViewController: UIViewController {
     var saving: Bool = false
     var saved: Bool = false
     var saveTimer: Timer!
+    var ignoreKVO = false
         
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,6 +38,11 @@ class ComposeViewController: UIViewController {
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        
+        if(ignoreKVO) {
+            return
+        }
+        
         if(keyPath == "text") {
             textView.text = (object as! Note).safeText()
         } else if(keyPath == "title") {
@@ -89,7 +95,7 @@ class ComposeViewController: UIViewController {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: tagsTitle, style: .plain, target: self, action: #selector(tagsPressed))
     }
     
-    func reloadTitle(offline: Bool) {
+    func reloadTitleBar(offline: Bool) {
         let titleString = NSMutableAttributedString(string: "Compose" + (saving || saved ? "\n" : ""), attributes: [NSFontAttributeName: UIFont.boldSystemFont(ofSize: 17.0)])
         
         if saving || saved {
@@ -128,15 +134,17 @@ class ComposeViewController: UIViewController {
 
         self.navigationController?.pushViewController(tags, animated: true)
     }
-    
-    var didShowErrorAlert: Bool = false
 
     func save() {
         saving = true
         saved = false
-        reloadTitle(offline: false)
+        reloadTitleBar(offline: false)
+        
+        ignoreKVO = true
         self.note.title = self.titleTextField.text
         self.note.text = self.textView.text
+        ignoreKVO = false
+        
         self.note.draft = false
         self.note.dirty = true
         ApiController.sharedInstance.sync { error in
@@ -145,15 +153,16 @@ class ComposeViewController: UIViewController {
 
             if error == nil {
                 delay(0.1, closure: {
-                    self.reloadTitle(offline: false)
+                    self.reloadTitleBar(offline: false)
                 })
             } else {
                 delay(0.2, closure: {
-                    self.reloadTitle(offline: true)
+                    self.reloadTitleBar(offline: true)
                 })
-                if(!self.didShowErrorAlert) {
+               
+                if(!SyncController.sharedInstance.didShowOfflineErrorAlert) {
                     self.showAlert(title: "Oops", message: "There was an error saving your data to the server. Please check your server settings and try again.")
-                    self.didShowErrorAlert = true
+                    SyncController.sharedInstance.didShowOfflineErrorAlert = true
                 }
             }
         }
@@ -185,6 +194,5 @@ extension ComposeViewController : UITextViewDelegate {
     
     func textViewDidChange(_ textView: UITextView) {
         beginSaveTimer()
-        
     }
 }

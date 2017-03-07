@@ -165,6 +165,7 @@ class ApiController {
         .responseJSON { response in
             if let error = response.result.error {
                 print("Error saving items: \(error)")
+                ItemManager.sharedInstance.saveContext()
                 completion(error)
             } else {
                 ItemManager.sharedInstance.clearDirty(items: dirty)

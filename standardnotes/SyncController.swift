@@ -12,6 +12,8 @@ class SyncController {
     
     static var sharedInstance = SyncController()
     
+    var didShowOfflineErrorAlert = false
+    
     var syncTimer : Timer?
     let syncTimeInterval : TimeInterval = 30
     
