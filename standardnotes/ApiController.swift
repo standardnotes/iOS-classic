@@ -201,12 +201,13 @@ class ApiController {
         var params = [String : Any]()
         params["content_type"] = item.contentType
         params["uuid"] = item.uuid
-        
         params["deleted"] = item.modelDeleted
+        
+        let encryptionVersion = "001"
         
         if(encrypted) {
             // send encrypted
-            let encryptedParams = Crypto.sharedInstance.encryptionParams(forItem: item)
+            let encryptedParams = Crypto.sharedInstance.encryptionParams(forItem: item, version: encryptionVersion)
             if(encryptedParams != nil) {
                 params.merge(with: encryptedParams!)
             }
