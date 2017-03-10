@@ -125,7 +125,7 @@ class Crypto {
             params["auth_hash"] = authHashString(encryptedContent: params["content"] as! String, authKey: ak)
         } else {
             let iv = generateRandomHexKey(size: 128)
-            let cipherText = encrypt(message: itemKey, key: ek, iv: iv)
+            let cipherText = encrypt(message: message, key: ek, iv: iv)
             let stringToAuth = [version, iv, cipherText].joined(separator: ":")
             let authHash = authHashString(encryptedContent: stringToAuth, authKey: ak)
             params["content"] = [version, authHash, iv, cipherText].joined(separator: ":")
@@ -201,7 +201,6 @@ class Crypto {
             }
             
             let encryptionVersion = item["content"].string?.substring(to: 3)
-        
             
             if (encryptionVersion == "001" || encryptionVersion == "002"), let enc_key = item["enc_item_key"].string {
             
