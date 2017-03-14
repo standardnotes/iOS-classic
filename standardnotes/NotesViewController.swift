@@ -307,6 +307,7 @@ extension NotesViewController : NSFetchedResultsControllerDelegate {
         case .update:
             if let cell = tableView.cellForRow(at: indexPath! as IndexPath) as? NoteTableViewCell {
                 configureCell(cell: cell, indexPath: indexPath! as NSIndexPath)
+                tableView.reloadRows(at: [indexPath!], with: .none)
             }
         case .move:
             tableView.moveRow(at: indexPath! as IndexPath, to: newIndexPath! as IndexPath)
