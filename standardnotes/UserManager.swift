@@ -8,6 +8,12 @@
 
 import Foundation
 
+struct Keys {
+    var mk: String?
+    var encryptionKey: String
+    var authKey: String
+}
+
 class UserManager {
     
     static let LogoutNotification = "LogoutNotification"
@@ -31,6 +37,17 @@ class UserManager {
     var server: String!
     var mk: String!
     var jwt: String!
+    
+
+    var _keys: Keys!
+    var keys: Keys {
+        get {
+            if(_keys == nil) {
+                _keys = Crypto.sharedInstance.generateKeysFromMasterKey(masterKey: mk)
+            }
+            return _keys
+        }
+    }
     
     //#MARK TouchID modifies User default
     var touchIDEnabled: Bool {
