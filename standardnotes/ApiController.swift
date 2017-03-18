@@ -203,7 +203,7 @@ class ApiController {
         params["uuid"] = item.uuid
         params["deleted"] = item.modelDeleted
         
-        let encryptionVersion = "002"
+        let encryptionVersion = "001"
         
         if(encrypted) {
             // send encrypted
