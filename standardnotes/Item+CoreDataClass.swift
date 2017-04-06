@@ -42,7 +42,7 @@ public class Item: NSManagedObject {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
         let date = dateFormatter.date(from: string)
-        return date!
+        return date != nil ? date! : Date()
     }
     
     func stringFromDate(date: Date) -> String {
