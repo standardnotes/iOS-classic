@@ -9,6 +9,8 @@
 import UIKit
 import CoreData
 import LocalAuthentication
+import HockeySDK
+
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -29,8 +31,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Theme.Initialize()
         ItemManager.initializeSharedInstance(context: self.persistentContainer.viewContext)
         attemptFingerPrint()
+        initializeCrashReporting()
         SyncController.sharedInstance.startSyncing()
         return true
+    }
+    
+    func initializeCrashReporting() {
+        BITHockeyManager.shared().configure(withIdentifier: "f6d12c22bdad48e5a07aa578822b4620")
+        BITHockeyManager.shared().isMetricsManagerDisabled = true
+        BITHockeyManager.shared().start()
+        BITHockeyManager.shared().authenticator.authenticateInstallation()
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
