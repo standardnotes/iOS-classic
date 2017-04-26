@@ -253,7 +253,7 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
     func register() {
         ApiController.sharedInstance.register(email: email!, password: password!) { (error) in
             if error != nil {
-                self.showAlert(title: "Oops", message: error!.localizedDescription)
+                self.showAlert(title: "Oops", message: error!)
                 return
             }
             self.accountStatusChanged(true)
@@ -265,7 +265,7 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
         
         ApiController.sharedInstance.signInUser(email: email!, password: password!) { (error) in
             if error != nil {
-                self.showAlert(title: "Oops", message: error!.localizedDescription)
+                self.showAlert(title: "Oops", message: error!)
                 return
             }
             self.accountStatusChanged(true)

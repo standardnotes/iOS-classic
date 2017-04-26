@@ -60,7 +60,7 @@ class ApiController {
         return pwParams.merged(with: ["pw_salt" : salt, "pw_nonce" : nonce]) as [String : AnyObject]
     }
     
-    func register(email: String, password: String, completion: @escaping (Error?) -> ()) {
+    func register(email: String, password: String, completion: @escaping (String?) -> ()) {
 
         var authParams = createRegistrationAuthParams(forEmail: email)
         let result = Crypto.sharedInstance.pbkdf2(hash: CCPBKDFAlgorithm(kCCPRFHmacAlgSHA512), password: password, salt: authParams["pw_salt"] as! String, keyByteCount: (authParams["pw_key_size"] as! Int)/8, rounds: authParams["pw_cost"] as! Int)!
@@ -75,24 +75,25 @@ class ApiController {
         Alamofire.request("\(self.server)/auth", method: .post, parameters: parameters)
             .validate(statusCode: 200..<300)
             .responseJSON { response in
-            if response.result.error != nil {
-                completion(response.result.error)
-                return
-            }
-            let json = JSON(data: response.data!)
-            UserManager.sharedInstance.jwt = json["token"].string!
-            authParams.removeValue(forKey: "pw_nonce")
-            UserManager.sharedInstance.authParams = authParams
-            UserManager.sharedInstance.save()
-            completion(nil)
+                let json = JSON(data: response.data!)
+                if response.result.error != nil {
+                    let error = json["error"].dictionary
+                    completion(error?["message"]?.string)
+                    return
+                }
+                UserManager.sharedInstance.jwt = json["token"].string!
+                authParams.removeValue(forKey: "pw_nonce")
+                UserManager.sharedInstance.authParams = authParams
+                UserManager.sharedInstance.save()
+                completion(nil)
         }
     }
     
-    func signInUser(email: String, password: String, completion: @escaping (Error?) -> ()) {
+    func signInUser(email: String, password: String, completion: @escaping (String?) -> ()) {
         getAuthParams(email: email) { (authParams, error) in
             
             if error != nil {
-                completion(error)
+                completion("An unknown error occured.")
                 return
             }
 
@@ -107,15 +108,17 @@ class ApiController {
             Alamofire.request("\(self.server)/auth/sign_in.json", method: .post, parameters: parameters)
                 .validate(statusCode: 200..<300)
                 .responseJSON { response in
-                if response.result.error != nil {
-                    completion(response.result.error)
-                    return
-                }
-                let json = JSON(data: response.data!)
-                UserManager.sharedInstance.jwt = json["token"].string!
-                UserManager.sharedInstance.authParams = authParams?.object as! [String : Any]?
-                UserManager.sharedInstance.save()
-                completion(nil)
+                
+                    let json = JSON(data: response.data!)
+                    if response.result.error != nil {
+                        let error = json["error"].dictionary
+                        completion(error?["message"]?.string)
+                        return
+                    }
+                    UserManager.sharedInstance.jwt = json["token"].string!
+                    UserManager.sharedInstance.authParams = authParams?.object as! [String : Any]?
+                    UserManager.sharedInstance.save()
+                    completion(nil)
             }
         }
     }
