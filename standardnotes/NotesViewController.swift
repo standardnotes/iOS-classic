@@ -237,6 +237,11 @@ extension NotesViewController: UISearchBarDelegate {
 extension NotesViewController : UITableViewDelegate, UITableViewDataSource {
     
     func configureCell(cell: NoteTableViewCell, indexPath: NSIndexPath) {
+        // check if out of bounds
+        let sectionInfo = resultsController.sections![indexPath.section]
+        if sectionInfo.numberOfObjects <= indexPath.row {
+            return
+        }
         let selectedObject = resultsController.object(at: indexPath as IndexPath) as Note
         cell.titleLabel?.text = selectedObject.safeTitle()
         cell.contentLabel?.text = selectedObject.safeText()

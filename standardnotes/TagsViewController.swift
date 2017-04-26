@@ -155,6 +155,11 @@ class TagsViewController: UIViewController {
 extension TagsViewController : UITableViewDelegate, UITableViewDataSource {
     
     func configureCell(cell: TagTableViewCell, indexPath: NSIndexPath) {
+        // check if out of bounds
+        let sectionInfo = resultsController.sections![indexPath.section]
+        if sectionInfo.numberOfObjects <= indexPath.row {
+            return
+        }
         let selectedObject = resultsController.object(at: indexPath as IndexPath) as Tag
         cell.titleLabel?.text = "\(selectedObject.safeTitle())"
         cell.switch.setOn(isTagSelected(tag: selectedObject), animated: false)

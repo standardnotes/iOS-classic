@@ -140,7 +140,7 @@ class ItemManager {
             if referencedItem != nil {
                 item.addItemAsRelationship(item: referencedItem!)
             } else {
-                print("Unable to find referenced item.")
+                // print("Unable to find referenced item.")
             }
         }
     }
