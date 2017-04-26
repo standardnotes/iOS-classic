@@ -66,7 +66,6 @@ class ItemManager {
     func findOrCreateItem(uuid: String, contentType: String) -> Item {
         var item = findItem(uuid: uuid, contentType: contentType)
         if item == nil {
-            print("Did not find item for \(uuid), creating.")
             item = NSEntityDescription.insertNewObject(forEntityName: contentType, into: self.context) as? Item
         }
         
