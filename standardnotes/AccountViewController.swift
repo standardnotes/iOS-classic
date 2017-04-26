@@ -9,6 +9,7 @@
 import UIKit
 import MessageUI
 import LocalAuthentication
+import CoreData
 
 class AccountViewController: UITableViewController, MFMailComposeViewControllerDelegate {
     
@@ -21,6 +22,7 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
     @IBOutlet weak var exportButton: UIButton!
     @IBOutlet weak var touchIDButton: UIButton!
     @IBOutlet weak var feedbackButton: UIButton!
+    @IBOutlet weak var encryptionStatusButton: UIButton!
     
     var password: String?
     
@@ -43,39 +45,56 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
     
     func reloadData() {
         
-        if UserManager.sharedInstance.signedIn {
-            self.signInButton.isEnabled = false
-            self.registerButton.isEnabled = false
-            self.signOutButton.isEnabled = true
-            self.exportButton.isEnabled = true
-            
+        let signedIn = UserManager.sharedInstance.signedIn
+        
+        signInButton.isEnabled = !signedIn
+        registerButton.isEnabled = !signedIn
+        
+        signOutButton.isEnabled = signedIn
+        exportButton.isEnabled = signedIn
+        encryptionStatusButton.isEnabled = signedIn;
+        
+        if(signedIn) {
+            let itemCount = getItemCount()
+            encryptionStatusButton.setTitle("\(itemCount)/\(itemCount) items encrypted", for: .normal)
         } else {
-            self.signInButton.isEnabled = true
-            self.registerButton.isEnabled = true
-            self.signOutButton.isEnabled = false
-            self.exportButton.isEnabled = false
+            encryptionStatusButton.setTitle("Sign in or register to enable encryption.", for: .normal)
         }
         
         var error : NSError?
         let touchIDContext = LAContext()
         self.touchIDButton.isEnabled = touchIDContext.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
         if !touchIDButton.isEnabled {
-            touchIDButton.setTitle("Touch ID not available.", for: UIControlState.normal)
+            touchIDButton.setTitle("Touch ID not available.", for: .normal)
         } else {
             if UserManager.sharedInstance.touchIDEnabled {
-                touchIDButton.setTitle("Disable Touch ID", for: UIControlState.normal)
+                touchIDButton.setTitle("Disable Touch ID", for: .normal)
             } else {
-                touchIDButton.setTitle("Enable Touch ID", for: UIControlState.normal)
+                touchIDButton.setTitle("Enable Touch ID", for: .normal)
             }
         }
         
-        self.serverTextField.isEnabled = !UserManager.sharedInstance.signedIn
-        self.emailTextField.isEnabled = !UserManager.sharedInstance.signedIn
-        self.passwordTextField.isEnabled = !UserManager.sharedInstance.signedIn
+        self.serverTextField.isEnabled = !signedIn
+        self.emailTextField.isEnabled = !signedIn
+        self.passwordTextField.isEnabled = !signedIn
         
         self.serverTextField.text = UserManager.sharedInstance.server
         self.emailTextField.text = UserManager.sharedInstance.email
         self.passwordTextField.text = self.password
+        
+        tableView.reloadData()
+    }
+    
+    func getItemCount() -> Int {
+        let request = NSFetchRequest<NSFetchRequestResult>()
+        request.entity = NSEntityDescription.entity(forEntityName: "Item", in: AppDelegate.sharedContext)
+        do {
+            let count = try AppDelegate.sharedContext.count(for: request)
+            return count
+        } catch {
+            print("Count error: \(error)")
+            return 0
+        }
     }
     
     func saveFields() {
@@ -250,6 +269,10 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
         self.dismiss(animated: true, completion: nil)
     }
     
+    @IBAction func encryptionStatusPressed(_ sender: Any) {
+        self.showAlert(title: "Encryption Enabled", message: "All your data, including your notes and tags, are encrypted on your device before being sent to the cloud. This means no one can read your notes: not us, not a hacker, and not someone spying on your network.")
+    }
+    
     func register() {
         ApiController.sharedInstance.register(email: email!, password: password!) { (error) in
             if error != nil {
@@ -284,10 +307,21 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
     @IBAction func toggleTouchID(toggleButton: UIButton) {
         UserManager.sharedInstance.toggleTouchID()
         if UserManager.sharedInstance.touchIDEnabled {
-            touchIDButton.setTitle("Disable Touch ID", for: UIControlState.normal)
+            touchIDButton.setTitle("Disable Touch ID", for: .normal)
         } else {
-             touchIDButton.setTitle("Enable Touch ID", for: UIControlState.normal)
+             touchIDButton.setTitle("Enable Touch ID", for: .normal)
         }
+    }
+    
+    override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        if(section == 0) {
+            if UserManager.sharedInstance.signedIn {
+                return nil
+            } else {
+                return "Enter your Standard File account information. If you don't have an account, simply choose an email and password and press Register."
+            }
+        }
+        return nil
     }
 }
 
