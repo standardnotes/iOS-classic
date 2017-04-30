@@ -261,7 +261,7 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
         let mailComposer = MFMailComposeViewController()
         mailComposer.mailComposeDelegate = self
         mailComposer.setSubject("Feedback on iOS app (v\(versionNumber).\(buildNumber))")
-        mailComposer.setToRecipients(["standardnotes@bitar.io"])
+        mailComposer.setToRecipients(["ios@standardnotes.org"])
         self.present(mailComposer, animated: true, completion: nil)
     }
     
@@ -298,7 +298,7 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
     
     @IBAction func feedbackPressed(_ sender: Any) {
         if(!MFMailComposeViewController.canSendMail() ) {
-            self.showAlert(title: "Oops", message: "Your device cannot send email. Please send feedback to standardnotes@bitar.io.")
+            self.showAlert(title: "Oops", message: "Your device cannot send email. Please send feedback to ios@standardnotes.org.")
             return
         }
         showFeedbackComposer()
