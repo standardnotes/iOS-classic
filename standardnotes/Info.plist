@@ -34,6 +34,19 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>UIApplicationShortcutItems</key>
+	<array>
+		<dict>
+			<key>UIApplicationShortcutItemIconType</key>
+			<string>add</string>
+			<key>UIApplicationShortcutItemSubtitle</key>
+			<string>Open the Composer</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Create new Note</string>
+			<key>UIApplicationShortcutItemType</key>
+			<string>org.standardnotes.standardnotes.new-note</string>
+		</dict>
+	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
