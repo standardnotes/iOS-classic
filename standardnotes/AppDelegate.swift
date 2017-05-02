@@ -11,7 +11,6 @@ import CoreData
 import LocalAuthentication
 import HockeySDK
 
-
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -103,7 +102,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         })
         return container
     }()
-
+    
     // MARK: - Core Data Saving support
 
     func saveContext () {
