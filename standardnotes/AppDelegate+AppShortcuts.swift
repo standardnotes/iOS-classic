@@ -2,8 +2,8 @@
 //  AppDelegate+AppShortcuts.swift
 //  standardnotes
 //
-//  Created by Seishinryoku on 02.05.17.
-//  Copyright © 2017 Standard Notes. All rights reserved.
+//  Created by Florian Schuttkowski (Flowinho) on 02.05.17.
+//  Copyright © 2017 Standard Notes / Florian Schuttkowski. All rights reserved.
 //
 
 import Foundation
