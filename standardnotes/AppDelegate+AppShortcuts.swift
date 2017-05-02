@@ -42,10 +42,29 @@ extension AppDelegate {
     func navigateToViewControllerFor(shortcut:ApplicationShortCut){
         switch shortcut {
         case .newNote:
-            print("")
+            navigateToComposerController(after: 0.01)
         case .listNotes:
             navigateToNotesController(afterDelay: 0.01)
         }
     }
+
+    func navigateToComposerController(after delayInSeconds: Double) {
+        delay(delayInSeconds) {
+            // This is needed to get access to the navigation controller since the storyboard defines nested 
+            // navigation controllers.
+            // Double checking this.
+            if let tabController = UIApplication.shared.keyWindow?.rootViewController as? UITabBarController {
+                    tabController.selectedIndex = 0
+                    // This optional binding to NotesViewController fails. Investigate
+                    if let notesVC = tabController.selectedViewController as? NotesViewController {
+                        // String identifier for viewController reference in SB - replace this by an enum
+                        if let compose = notesVC.storyboard?.instantiateViewController(withIdentifier: "Compose") as? ComposeViewController {
+                            notesVC.navigationController?.pushViewController(compose, animated: true)
+                        }
+                }
+            }
+        }
+    }
+
 }
 
