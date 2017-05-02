@@ -87,7 +87,7 @@ class TagsViewController: UIViewController {
     
     func configureResultsController() {
         let fetchRequest = NSFetchRequest<Tag>(entityName: "Tag")
-        let sort = NSSortDescriptor(key: "uuid", ascending: true)
+        let sort = NSSortDescriptor(key: "title", ascending: true)
         fetchRequest.sortDescriptors = [sort]
         resultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: AppDelegate.sharedContext, sectionNameKeyPath: nil, cacheName: nil)
         resultsController.delegate = self
