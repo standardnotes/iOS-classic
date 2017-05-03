@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Cipher Notes</string>
+	<string>Fancy Notes</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.1</string>
+	<string></string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
@@ -25,12 +25,12 @@
 	<key>UIApplicationShortcutItems</key>
 	<array>
 		<dict>
-			<key>UIApplicationShortcutItemIconType</key>
-			<string>UIApplicationShortcutIconTypeHome</string>
-			<key>UIApplicationShortcutItemTitle</key>
-			<string>All Notes</string>
 			<key>UIApplicationShortcutItemType</key>
 			<string>org.standardnotes.standardnotes.list-notes</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>All Notes</string>
+			<key>UIApplicationShortcutItemIconType</key>
+			<string>UIApplicationShortcutIconTypeHome</string>
 		</dict>
 		<dict>
 			<key>UIApplicationShortcutItemIconType</key>
