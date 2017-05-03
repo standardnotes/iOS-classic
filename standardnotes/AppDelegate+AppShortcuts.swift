@@ -30,22 +30,13 @@ extension AppDelegate {
         var succeeded = false
         switch shortCut {
         case .newNote:
-            navigateToViewControllerFor(shortcut: shortCut)
+            navigateToComposerController(after: 0.01)
             succeeded = true
         case .listNotes:
-            navigateToViewControllerFor(shortcut: shortCut)
+           navigateToNotesController(afterDelay: 0.01)
             succeeded = true
         }
         return succeeded
-    }
-    
-    func navigateToViewControllerFor(shortcut:ApplicationShortCut){
-        switch shortcut {
-        case .newNote:
-            navigateToComposerController(after: 0.01)
-        case .listNotes:
-            navigateToNotesController(afterDelay: 0.01)
-        }
     }
 
     func navigateToComposerController(after delayInSeconds: Double) {
