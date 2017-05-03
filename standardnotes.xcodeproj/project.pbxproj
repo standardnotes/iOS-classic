@@ -38,6 +38,8 @@
 		B89178E41E0DBDC500163EA7 /* NoteTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89178E31E0DBDC500163EA7 /* NoteTableViewCell.swift */; };
 		B89178E81E0DC81500163EA7 /* TagTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89178E71E0DC81500163EA7 /* TagTableViewCell.swift */; };
 		CDAAB63F1E0DE3B30033487A /* ViewController+Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDAAB63E1E0DE3B30033487A /* ViewController+Util.swift */; };
+		EB1897191EB9196E00D9384F /* AppDelegate+AppShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB1897181EB9196E00D9384F /* AppDelegate+AppShortcuts.swift */; };
+		EB1897241EBA5D2700D9384F /* GIT-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = EB1897231EBA5D2700D9384F /* GIT-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -148,6 +150,8 @@
 		B89178E31E0DBDC500163EA7 /* NoteTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoteTableViewCell.swift; sourceTree = "<group>"; };
 		B89178E71E0DC81500163EA7 /* TagTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TagTableViewCell.swift; sourceTree = "<group>"; };
 		CDAAB63E1E0DE3B30033487A /* ViewController+Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ViewController+Util.swift"; sourceTree = "<group>"; };
+		EB1897181EB9196E00D9384F /* AppDelegate+AppShortcuts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AppDelegate+AppShortcuts.swift"; sourceTree = "<group>"; };
+		EB1897231EBA5D2700D9384F /* GIT-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GIT-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -221,7 +225,7 @@
 		B82B6DF91E08AA660025C3EC /* standardnotes */ = {
 			isa = PBXGroup;
 			children = (
-				B82B6DFA1E08AA660025C3EC /* AppDelegate.swift */,
+				EB1897171EB9194100D9384F /* App Delegate */,
 				B8046A721E2A8074006A5F03 /* Theme.swift */,
 				B809F2B91E0B5173007D5700 /* View Controllers */,
 				CDAAB6411E0DE4D30033487A /* Controllers */,
@@ -314,12 +318,22 @@
 		CDAAB6421E0DE4DE0033487A /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				EB1897231EBA5D2700D9384F /* GIT-Info.plist */,
 				B872EC871E08D00400CC7656 /* standardnotes-Bridging-Header.h */,
 				B82B6E041E08AA660025C3EC /* Assets.xcassets */,
 				B82B6E061E08AA660025C3EC /* LaunchScreen.storyboard */,
 				B82B6E091E08AA660025C3EC /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		EB1897171EB9194100D9384F /* App Delegate */ = {
+			isa = PBXGroup;
+			children = (
+				B82B6DFA1E08AA660025C3EC /* AppDelegate.swift */,
+				EB1897181EB9196E00D9384F /* AppDelegate+AppShortcuts.swift */,
+			);
+			name = "App Delegate";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -357,7 +371,7 @@
 				TargetAttributes = {
 					B82B6DF61E08AA660025C3EC = {
 						CreatedOnToolsVersion = 8.2;
-						DevelopmentTeam = HKF9BXSN95;
+						DevelopmentTeam = V79G9DGK5T;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 					};
@@ -447,6 +461,7 @@
 				B82B6E081E08AA660025C3EC /* LaunchScreen.storyboard in Resources */,
 				B819588E1E96D19000422600 /* HockeySDKResources.bundle in Resources */,
 				B82B6E051E08AA660025C3EC /* Assets.xcassets in Resources */,
+				EB1897241EBA5D2700D9384F /* GIT-Info.plist in Resources */,
 				B82B6E001E08AA660025C3EC /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -465,7 +480,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "FILE=\"${SRCROOT}/HockeySDK-iOS/BuildAgent\"\nif [ -f \"$FILE\" ]; then\n\"$FILE\"\nfi";
+			shellScript = "FILE=\"${SRCROOT}/HockeySDK-iOS/BuildAgent\"\nif [ -f \"$FILE\" ]; then\n\"$FILE\"\nfi\n#--------------------------------------------------------------------------------------#\n# This script uses the GIT terminal commands to retrieve\n# repository information which is then added to a propertylist\n# using /usr/libexec/PListBuddy.\n#\n# Requirements: xcode-commandline-tools, OS X > 10.6, GIT installed\n# Author: Flowinho <> http://github.com/flowinho\n# Feel free to help me enhance the functionality.\n#\n# Most git command examples are taken from http://git-scm.com\n#\n# Usage:\n#   - Each Build: Copy&Paste into the \"Run Script\" Build Phase of your xcodeproj\n#   - Manually: Execute manually from terminal\n#--------------------------------------------------------------------------------------#\n\nset -o errexit\nset -o nounset\n\n#---------------------------------------------------------------------#\n## Check dependencies\n# GIT setup\nhash git 2>/dev/null || { echo >&2 \"There is no local installation of GIT available. Script cannot be executed.\"; exit 0; }\n# Define or locate property list to update\n# If the PList is not available at the target location, it will be created.\nGIT_INFO_LIST=\"${PROJECT_DIR}/GIT-Info.plist\"\nPROJECT_INFO_LIST=\"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n\n# Define the branch to use, this should be master in almost every usecase.\nTARGET_BRANCH=\"master\"\n\n#---------------------------------------------------------------------#\n## Execute GIT information fetch\nLATEST_TAG=$(git describe --tags 2>/dev/null) || LATEST_TAG=\"HEAD\"\nMOST_RECENT_VERSION_TAG=$(git describe --abbrev=0 --tags)\nREVISION_HASH_HEAD=$(git rev-parse HEAD)\nCURRENT_BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)\nLAST_COMMIT=$(git log -1 --pretty=format:\"%h - %an, %ar : %s\")\n\nCOMMIT_COUNT_SINCE_TAG=0\n\n#---------------------------------------------------------------------#\n## Current branch: Calculate amount commits since most recent tag.\nif [ $LATEST_TAG == \"HEAD\" ]\nthen COMMIT_COUNT=$(git rev-list --count HEAD)\nLATEST_TAG=\"0.$COMMIT_COUNT\"\nCOMMIT_COUNT_SINCE_TAG=0\nelse\nCOMMIT_COUNT_SINCE_TAG=$(git rev-list --count ${LATEST_TAG}..)\nfi\n\n## Calculate overall amount of commits in current branch & master branch\nif [ $(git rev-parse --abbrev-ref HEAD) = master ]; then\nTARGET_BRANCH_COMMIT_COUNT=$(git rev-list --count HEAD)\nBRANCH_COMMIT_COUNT=0\nelse\n##TARGET_BRANCH_COMMIT_COUNT=$(git rev-list --count $(git rev-list master.. | tail -n 1)^)\nBRANCH_COMMIT_COUNT=$(git rev-list --count $CURRENT_BRANCH_NAME..)\nTARGET_BRANCH_COMMIT_COUNT=$(git rev-list --count master..)\nfi\n\n#---------------------------------------------------------------------#\n## Generate Full Version Definition - this differs from Project to Project, adjust as you like.\nFULL_VERSION=\"$MOST_RECENT_VERSION_TAG.$TARGET_BRANCH_COMMIT_COUNT\"\n\n#---------------------------------------------------------------------#\n## Debug the information to the console\necho \"\"\necho \"--------------------- GIT Bash Script - PList Updater ---------------------\"\necho \"LATEST_TAG:                   $LATEST_TAG\"\necho \"MOST_RECENT_VERSION_TAG:      $MOST_RECENT_VERSION_TAG\"\necho \"REVISION_HASH_HEAD:           $REVISION_HASH_HEAD\"\necho \"TARGET_BRANCH:                $TARGET_BRANCH\"\necho \"CURRENT_BRANCH_NAME:          $CURRENT_BRANCH_NAME\"\necho \"LAST_COMMIT:                  $LAST_COMMIT\"\necho \"TARGET_BRANCH_COMMIT_COUNT:   $TARGET_BRANCH_COMMIT_COUNT\"\necho \"BRANCH_COMMIT_COUNT:          $BRANCH_COMMIT_COUNT\"\necho \"---------------------------------------------------------------------------\"\n\n#---------------------------------------------------------------------#\n## Save for future use\n/usr/libexec/PlistBuddy -c \"Add :GITVersionTag string $MOST_RECENT_VERSION_TAG\" \"$GIT_INFO_LIST\" 2>/dev/null || /usr/libexec/PlistBuddy -c \"Set :GITVersionTag $MOST_RECENT_VERSION_TAG\" \"$GIT_INFO_LIST\"\n/usr/libexec/PlistBuddy -c \"Add :GITRevisionHash string $REVISION_HASH_HEAD\" \"$GIT_INFO_LIST\" 2>/dev/null || /usr/libexec/PlistBuddy -c \"Set :GITRevisionHash $REVISION_HASH_HEAD\" \"$GIT_INFO_LIST\"\n/usr/libexec/PlistBuddy -c \"Add :GITMasterCommitCount string $TARGET_BRANCH_COMMIT_COUNT\" \"$GIT_INFO_LIST\" 2>/dev/null || /usr/libexec/PlistBuddy -c \"Set :GITMasterCommitCount $TARGET_BRANCH_COMMIT_COUNT\" \"$GIT_INFO_LIST\"\n/usr/libexec/PlistBuddy -c \"Add :GITCurrentBranchName string $CURRENT_BRANCH_NAME\" \"$GIT_INFO_LIST\" 2>/dev/null || /usr/libexec/PlistBuddy -c \"Set :GITCurrentBranchName $CURRENT_BRANCH_NAME\" \"$GIT_INFO_LIST\"\n/usr/libexec/PlistBuddy -c \"Add :GITCurrentBranchCommitCount string $BRANCH_COMMIT_COUNT\" \"$GIT_INFO_LIST\" 2>/dev/null || /usr/libexec/PlistBuddy -c \"Set :GITCurrentBranchCommitCount $BRANCH_COMMIT_COUNT\" \"$GIT_INFO_LIST\"\n/usr/libexec/PlistBuddy -c \"Add :GITLastCommitLog string $LAST_COMMIT\" \"$GIT_INFO_LIST\" 2>/dev/null || /usr/libexec/PlistBuddy -c \"Set :GITLastCommitLog $LAST_COMMIT\" \"$GIT_INFO_LIST\"\n\n## Update iOS Properties\n/usr/libexec/PlistBuddy -c \"Add :CFBundleShortVersionString string $MOST_RECENT_VERSION_TAG\" \"$PROJECT_INFO_LIST\" 2>/dev/null || /usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $MOST_RECENT_VERSION_TAG\" \"$PROJECT_INFO_LIST\"\n/usr/libexec/PlistBuddy -c \"Add :CFBundleVersion string $FULL_VERSION\" \"$PROJECT_INFO_LIST\" 2>/dev/null || /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $FULL_VERSION\" \"$PROJECT_INFO_LIST\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -497,6 +512,7 @@
 				B878C4A01E09A1DD002A876F /* ItemManager.swift in Sources */,
 				B89178DC1E0CA96E00163EA7 /* TagsViewController.swift in Sources */,
 				B89178E01E0D84C200163EA7 /* UserManager.swift in Sources */,
+				EB1897191EB9196E00D9384F /* AppDelegate+AppShortcuts.swift in Sources */,
 				B878C4B21E09ADF6002A876F /* Crypto.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -632,7 +648,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = HKF9BXSN95;
+				DEVELOPMENT_TEAM = V79G9DGK5T;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -642,7 +658,7 @@
 				INFOPLIST_FILE = standardnotes/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = org.standardnotes.standardnotes;
+				PRODUCT_BUNDLE_IDENTIFIER = org.standardnotes.standardnotes.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "standardnotes-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -657,7 +673,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = HKF9BXSN95;
+				DEVELOPMENT_TEAM = V79G9DGK5T;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -667,7 +683,7 @@
 				INFOPLIST_FILE = standardnotes/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = org.standardnotes.standardnotes;
+				PRODUCT_BUNDLE_IDENTIFIER = org.standardnotes.standardnotes.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "standardnotes-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
