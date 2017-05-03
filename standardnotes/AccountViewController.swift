@@ -10,6 +10,7 @@ import UIKit
 import MessageUI
 import LocalAuthentication
 import CoreData
+import SafariServices
 
 class AccountViewController: UITableViewController, MFMailComposeViewControllerDelegate {
     
@@ -56,7 +57,7 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
         
         if(signedIn) {
             let itemCount = getItemCount()
-            encryptionStatusButton.setTitle("\(itemCount)/\(itemCount) items encrypted", for: .normal)
+            encryptionStatusButton.setTitle("\(itemCount)/\(itemCount) Items Encrypted", for: .normal)
         } else {
             encryptionStatusButton.setTitle("Sign in or register to enable encryption.", for: .normal)
         }
@@ -271,6 +272,12 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
     
     @IBAction func encryptionStatusPressed(_ sender: Any) {
         self.showAlert(title: "Encryption Enabled", message: "All your data, including your notes and tags, are encrypted on your device before being sent to the cloud. This means no one can read your notes: not us, not a hacker, and not someone spying on your network.")
+    }
+    
+    @IBAction func learnMorePressed(_ sender: Any) {
+        let sf = SFSafariViewController(url: URL(string: "https://standardnotes.org")!)
+        sf.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+        self.present(sf, animated: true, completion: nil)
     }
     
     func register() {

@@ -10,7 +10,6 @@
 		6928F05B1E45F7A300A05DB9 /* SyncController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6928F05A1E45F7A300A05DB9 /* SyncController.swift */; };
 		B8046A731E2A8074006A5F03 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8046A721E2A8074006A5F03 /* Theme.swift */; };
 		B809F2B81E0B5164007D5700 /* ComposeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B809F2B71E0B5164007D5700 /* ComposeViewController.swift */; };
-		B814F8791EB0F33D00AD80A1 /* EncryptionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B814F8781EB0F33D00AD80A1 /* EncryptionViewController.swift */; };
 		B819588D1E96D19000422600 /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B819588B1E96D19000422600 /* HockeySDK.framework */; };
 		B819588E1E96D19000422600 /* HockeySDKResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = B819588C1E96D19000422600 /* HockeySDKResources.bundle */; };
 		B82B6DFB1E08AA660025C3EC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B82B6DFA1E08AA660025C3EC /* AppDelegate.swift */; };
@@ -120,7 +119,6 @@
 		6928F05A1E45F7A300A05DB9 /* SyncController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncController.swift; sourceTree = "<group>"; };
 		B8046A721E2A8074006A5F03 /* Theme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		B809F2B71E0B5164007D5700 /* ComposeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComposeViewController.swift; sourceTree = "<group>"; };
-		B814F8781EB0F33D00AD80A1 /* EncryptionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EncryptionViewController.swift; sourceTree = "<group>"; };
 		B819588B1E96D19000422600 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HockeySDK.framework; sourceTree = "<group>"; };
 		B819588C1E96D19000422600 /* HockeySDKResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = HockeySDKResources.bundle; sourceTree = "<group>"; };
 		B82B6DF71E08AA660025C3EC /* standardnotes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = standardnotes.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -194,7 +192,6 @@
 			isa = PBXGroup;
 			children = (
 				B89178DD1E0D7D8300163EA7 /* AccountViewController.swift */,
-				B814F8781EB0F33D00AD80A1 /* EncryptionViewController.swift */,
 			);
 			name = Account;
 			sourceTree = "<group>";
@@ -499,7 +496,6 @@
 				B8046A731E2A8074006A5F03 /* Theme.swift in Sources */,
 				B89178DA1E0C9B9D00163EA7 /* Tag+CoreDataProperties.swift in Sources */,
 				B89178E81E0DC81500163EA7 /* TagTableViewCell.swift in Sources */,
-				B814F8791EB0F33D00AD80A1 /* EncryptionViewController.swift in Sources */,
 				B89178CE1E0C9A4D00163EA7 /* Tag+CoreDataClass.swift in Sources */,
 				B82B6E181E08AC8C0025C3EC /* ApiController.swift in Sources */,
 				B878C4B51E09BAC2002A876F /* NSData+Crypto.m in Sources */,
