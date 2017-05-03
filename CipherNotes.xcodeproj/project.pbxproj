@@ -121,7 +121,7 @@
 		B809F2B71E0B5164007D5700 /* ComposeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComposeViewController.swift; sourceTree = "<group>"; };
 		B819588B1E96D19000422600 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HockeySDK.framework; sourceTree = "<group>"; };
 		B819588C1E96D19000422600 /* HockeySDKResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = HockeySDKResources.bundle; sourceTree = "<group>"; };
-		B82B6DF71E08AA660025C3EC /* standardnotes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = standardnotes.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B82B6DF71E08AA660025C3EC /* ciphernotes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ciphernotes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B82B6DFA1E08AA660025C3EC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B82B6DFC1E08AA660025C3EC /* NotesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesViewController.swift; sourceTree = "<group>"; };
 		B82B6DFF1E08AA660025C3EC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -217,7 +217,7 @@
 		B82B6DF81E08AA660025C3EC /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B82B6DF71E08AA660025C3EC /* standardnotes.app */,
+				B82B6DF71E08AA660025C3EC /* ciphernotes.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -339,9 +339,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B82B6DF61E08AA660025C3EC /* standardnotes */ = {
+		B82B6DF61E08AA660025C3EC /* ciphernotes */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B82B6E0C1E08AA660025C3EC /* Build configuration list for PBXNativeTarget "standardnotes" */;
+			buildConfigurationList = B82B6E0C1E08AA660025C3EC /* Build configuration list for PBXNativeTarget "ciphernotes" */;
 			buildPhases = (
 				B82B6DF31E08AA660025C3EC /* Sources */,
 				B82B6DF41E08AA660025C3EC /* Frameworks */,
@@ -354,9 +354,9 @@
 			dependencies = (
 				B82B6E3C1E08BC550025C3EC /* PBXTargetDependency */,
 			);
-			name = standardnotes;
+			name = ciphernotes;
 			productName = standardnotes;
-			productReference = B82B6DF71E08AA660025C3EC /* standardnotes.app */;
+			productReference = B82B6DF71E08AA660025C3EC /* ciphernotes.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -377,7 +377,7 @@
 					};
 				};
 			};
-			buildConfigurationList = B82B6DF21E08AA660025C3EC /* Build configuration list for PBXProject "standardnotes" */;
+			buildConfigurationList = B82B6DF21E08AA660025C3EC /* Build configuration list for PBXProject "CipherNotes" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -396,7 +396,7 @@
 			);
 			projectRoot = "";
 			targets = (
-				B82B6DF61E08AA660025C3EC /* standardnotes */,
+				B82B6DF61E08AA660025C3EC /* ciphernotes */,
 			);
 		};
 /* End PBXProject section */
@@ -658,7 +658,7 @@
 				INFOPLIST_FILE = standardnotes/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = org.standardnotes.standardnotes.dev;
+				PRODUCT_BUNDLE_IDENTIFIER = com.flowinho.ciphernotes.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "standardnotes-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -683,7 +683,7 @@
 				INFOPLIST_FILE = standardnotes/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = org.standardnotes.standardnotes.dev;
+				PRODUCT_BUNDLE_IDENTIFIER = com.flowinho.ciphernotes.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "standardnotes-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
@@ -693,7 +693,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B82B6DF21E08AA660025C3EC /* Build configuration list for PBXProject "standardnotes" */ = {
+		B82B6DF21E08AA660025C3EC /* Build configuration list for PBXProject "CipherNotes" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B82B6E0A1E08AA660025C3EC /* Debug */,
@@ -702,7 +702,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B82B6E0C1E08AA660025C3EC /* Build configuration list for PBXNativeTarget "standardnotes" */ = {
+		B82B6E0C1E08AA660025C3EC /* Build configuration list for PBXNativeTarget "ciphernotes" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B82B6E0D1E08AA660025C3EC /* Debug */,

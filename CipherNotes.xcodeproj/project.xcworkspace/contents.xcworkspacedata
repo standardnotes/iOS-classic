@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:standardnotes.xcodeproj">
+      location = "self:/Users/Seishinryoku/Repositories/standardNotes_iOS/CipherNotes.xcodeproj">
    </FileRef>
 </Workspace>
