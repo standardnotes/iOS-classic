@@ -45,12 +45,11 @@ extension AppDelegate {
             // navigation controllers.
             // Double checking this.
             if let tabController = UIApplication.shared.keyWindow?.rootViewController as? UITabBarController {
-                    tabController.selectedIndex = 0
                     // This optional binding to NotesViewController fails. Investigate
-                    if let notesVC = tabController.selectedViewController as? NotesViewController {
+                    if let navController = tabController.selectedViewController as? UINavigationController {
                         // String identifier for viewController reference in SB - replace this by an enum
-                        if let compose = notesVC.storyboard?.instantiateViewController(withIdentifier: "Compose") as? ComposeViewController {
-                            notesVC.navigationController?.pushViewController(compose, animated: true)
+                        if let compose = navController.storyboard?.instantiateViewController(withIdentifier: "Compose") as? ComposeViewController {
+                            navController.pushViewController(compose, animated: true)
                         }
                 }
             }
