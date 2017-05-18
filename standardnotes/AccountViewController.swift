@@ -24,6 +24,8 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
     @IBOutlet weak var touchIDButton: UIButton!
     @IBOutlet weak var feedbackButton: UIButton!
     @IBOutlet weak var encryptionStatusButton: UIButton!
+    @IBOutlet weak var serverLabel: UILabel!
+    @IBOutlet weak var advancedButton: UIButton!
     
     var password: String?
     
@@ -84,6 +86,10 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
         self.passwordTextField.text = self.password
         
         tableView.reloadData()
+        
+        serverTextField.isHidden = true
+        serverLabel.isHidden = true
+        advancedButton.isHidden = false
     }
     
     func getItemCount() -> Int {
@@ -303,6 +309,12 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
         }
     }
     
+    @IBAction func showAdvancedPressed(_ sender: UIButton) {
+        serverTextField.isHidden = false
+        serverLabel.isHidden = false
+        sender.isHidden = true
+    }
+    
     @IBAction func feedbackPressed(_ sender: Any) {
         if(!MFMailComposeViewController.canSendMail() ) {
             self.showAlert(title: "Oops", message: "Your device cannot send email. Please send feedback to ios@standardnotes.org.")
@@ -320,15 +332,18 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
         }
     }
     
-    override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+    @IBOutlet var accountHeaderView: UIView!
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if(UserManager.sharedInstance.signedIn) {
+            return nil
+        }
         if(section == 0) {
-            if UserManager.sharedInstance.signedIn {
-                return nil
-            } else {
-                return "Enter your Standard File account information. If you don't have an account, simply choose an email and password and press Register."
-            }
+            let headerView = UIView()
+            headerView.addSubview(accountHeaderView)
+            return headerView
         }
         return nil
     }
+    
 }
 

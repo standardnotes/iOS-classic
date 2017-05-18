@@ -29,7 +29,7 @@ class UserManager {
         mk = UserDefaults.standard.object(forKey: "mk") as! String?
         
         if server == nil {
-            server = "https://n3.standardnotes.org"
+            server = "https://sync.standardnotes.org"
         }
     }
     
