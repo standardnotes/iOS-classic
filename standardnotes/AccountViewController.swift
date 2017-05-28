@@ -345,5 +345,16 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
         return nil
     }
     
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        let defaultHeight: CGFloat = 35.0
+        if(UserManager.sharedInstance.signedIn) {
+            return defaultHeight
+        }
+        if(section == 0) {
+            return 70
+        }
+        return defaultHeight
+    }
+    
 }
 
