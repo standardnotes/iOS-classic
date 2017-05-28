@@ -37,20 +37,21 @@ class ApiController {
     func getAuthParams(email: String, completion: @escaping (JSON?, Error?) -> ()) {
         let parameters: Parameters = [
             "email": email,
-            ]
+        ]
+      
         Alamofire.request("\(self.server)/auth/params", method: .get, parameters: parameters).responseJSON { response in
             if response.result.error != nil {
                 completion(nil, response.result.error)
                 return
             }
-             let json = JSON(data: response.data!)
+            let json = JSON(data: response.data!)
             completion(json, nil)
             
         }
     }
     
     var server: String {
-        return UserManager.sharedInstance.server + "/api"
+        return UserManager.sharedInstance.server
     }
     
     func createRegistrationAuthParams(forEmail email: String) -> [String : AnyObject] {
@@ -89,11 +90,11 @@ class ApiController {
         }
     }
     
-    func signInUser(email: String, password: String, completion: @escaping (String?) -> ()) {
+    func signInUser(email: String, password: String, completion: @escaping (String?, Bool) -> ()) {
         getAuthParams(email: email) { (authParams, error) in
             
             if error != nil {
-                completion("An unknown error occured.")
+                completion("An unknown error occured.", false)
                 return
             }
 
@@ -105,20 +106,22 @@ class ApiController {
             
             let parameters: Parameters = ["email": email, "password" : pw]
             
-            Alamofire.request("\(self.server)/auth/sign_in.json", method: .post, parameters: parameters)
+            Alamofire.request("\(self.server)/auth/sign_in", method: .post, parameters: parameters)
                 .validate(statusCode: 200..<300)
                 .responseJSON { response in
-                
                     let json = JSON(data: response.data!)
                     if response.result.error != nil {
+                        let responseString = String(data: response.data!, encoding: .utf8)
+                        print("Sign in error: \(responseString!)")
+                        
                         let error = json["error"].dictionary
-                        completion(error?["message"]?.string)
+                        completion(error?["message"]?.string, false)
                         return
                     }
                     UserManager.sharedInstance.jwt = json["token"].string!
                     UserManager.sharedInstance.authParams = authParams?.object as! [String : Any]?
                     UserManager.sharedInstance.save()
-                    completion(nil)
+                    completion(nil, true)
             }
         }
     }

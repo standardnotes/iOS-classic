@@ -299,9 +299,9 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
     
     func signIn() {
         
-        ApiController.sharedInstance.signInUser(email: email!, password: password!) { (error) in
-            if error != nil {
-                self.showAlert(title: "Oops", message: error!)
+        ApiController.sharedInstance.signInUser(email: email!, password: password!) { (error, success) in
+            if success == false {
+                self.showAlert(title: "Oops", message: error != nil ? error! : "An unknown server error occurred.")
                 return
             }
             self.accountStatusChanged(true)
