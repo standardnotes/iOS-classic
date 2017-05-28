@@ -188,10 +188,10 @@
             </objects>
             <point key="canvasLocation" x="-70" y="1160"/>
         </scene>
-        <!--Tags-->
+        <!--Filter-->
         <scene sceneID="Lv6-AF-XbD">
             <objects>
-                <viewController storyboardIdentifier="Tags" title="Tags" hidesBottomBarWhenPushed="YES" id="Eol-qQ-MB3" customClass="TagsViewController" customModule="standardnotes" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="Tags" title="Filter" hidesBottomBarWhenPushed="YES" id="Eol-qQ-MB3" customClass="TagsViewController" customModule="standardnotes" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="XdM-Z4-ZJO"/>
                         <viewControllerLayoutGuide type="bottom" id="5SO-mQ-BJ6"/>
@@ -200,13 +200,13 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="50" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="gKh-hA-KHf">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="50" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="gKh-hA-KHf">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="TagCell" id="8AC-fi-swY" customClass="TagTableViewCell" customModule="standardnotes" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="28" width="375" height="50"/>
+                                        <rect key="frame" x="0.0" y="55.5" width="375" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="8AC-fi-swY" id="IVl-pp-XOa">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="49.5"/>
@@ -233,6 +233,14 @@
                                             <outlet property="switch" destination="9VV-zC-Aes" id="ZHe-Du-wob"/>
                                             <outlet property="titleLabel" destination="lHM-da-Oxj" id="yCF-hf-2mM"/>
                                         </connections>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="SortCell" rowHeight="40" id="nTA-xk-qhO">
+                                        <rect key="frame" x="0.0" y="105.5" width="375" height="40"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="nTA-xk-qhO" id="HDQ-6a-E8G">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="39.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
                                     </tableViewCell>
                                 </prototypes>
                                 <connections>

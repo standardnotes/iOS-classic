@@ -9,10 +9,20 @@
 import UIKit
 import CoreData
 
+
 class TagsViewController: UIViewController {
     
+    enum Section: Int {
+        case Sort = 0
+        case Tags = 1
+        case Count
+    }
+    
+    var hasSortType = true
+    var sort: SortType!
+    
     internal var selectedTags = NSMutableSet()
-    var selectionCompletion: (([Tag]) -> ())?
+    var selectionCompletion: (([Tag], SortType?) -> ())?
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -35,8 +45,9 @@ class TagsViewController: UIViewController {
     }
     
     func configureNavBar() {
+        self.title = hasSortType ? "Filter" : "Tags"
         if self.isModal {
-            self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Dismiss", style: .done, target: self, action: #selector(donePressed))
+            self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(donePressed))
         }
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New", style: .plain, target: self, action: #selector(newTagPressed))
     }
@@ -73,7 +84,7 @@ class TagsViewController: UIViewController {
     }
     
     func donePressed() {
-        self.selectionCompletion?(self.selectedTags.allObjects as! [Tag])
+        self.selectionCompletion?(self.selectedTags.allObjects as! [Tag], sort)
         self.dismiss(animated: true, completion: nil)
     }
     
@@ -81,7 +92,7 @@ class TagsViewController: UIViewController {
         super.viewWillDisappear(animated)
      
         if !self.isModal {
-            self.selectionCompletion?(self.selectedTags.allObjects as! [Tag])
+            self.selectionCompletion?(self.selectedTags.allObjects as! [Tag], sort)
         }
     }
     
@@ -97,6 +108,10 @@ class TagsViewController: UIViewController {
         catch {
             print("Error fetching: \(error)")
         }
+    }
+    
+    func mapFRCIndexPathToTableIndexPath(indexPath: IndexPath) -> IndexPath {
+        return IndexPath(row: indexPath.row, section: hasSortType ? Section.Tags.rawValue : 0)
     }
     
     func isTagSelected(tag: Tag) -> Bool {
@@ -149,18 +164,23 @@ class TagsViewController: UIViewController {
             }
         }
     }
+    
+    func tagAtIndexPath(indexPath: IndexPath) -> Tag {
+        return resultsController.object(at: IndexPath(row: indexPath.row, section: 0)) as Tag
+    }
+
 }
 
 
 extension TagsViewController : UITableViewDelegate, UITableViewDataSource {
     
-    func configureCell(cell: TagTableViewCell, indexPath: NSIndexPath) {
-        // check if out of bounds
-        let sectionInfo = resultsController.sections![indexPath.section]
+    func configureTagCell(cell: TagTableViewCell, indexPath: NSIndexPath) {
+        let sectionInfo = resultsController.sections![0]
         if sectionInfo.numberOfObjects <= indexPath.row {
             return
         }
-        let selectedObject = resultsController.object(at: indexPath as IndexPath) as Tag
+    
+        let selectedObject = tagAtIndexPath(indexPath: indexPath as IndexPath)
         cell.titleLabel?.text = "\(selectedObject.safeTitle())"
         cell.switch.setOn(isTagSelected(tag: selectedObject), animated: false)
         cell.tagObject = selectedObject
@@ -173,30 +193,78 @@ extension TagsViewController : UITableViewDelegate, UITableViewDataSource {
         }
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TagCell", for: indexPath)
-        configureCell(cell: cell as! TagTableViewCell, indexPath: indexPath as NSIndexPath)
-        return cell
+    func configureSortCell(cell: UITableViewCell, indexPath: NSIndexPath) {
+        let sortType = SortType(rawValue: indexPath.row)!
+        switch sortType {
+        case .Created:
+            cell.textLabel?.text = "Date Created"
+            break
+        case .Modified:
+            cell.textLabel?.text = "Date Modified"
+            break
+        case .Title:
+            cell.textLabel?.text = "Title"
+            break
+        default:
+            break
+        }
+        
+        cell.selectionStyle = .none
+        cell.accessoryType = sortType == sort ? UITableViewCellAccessoryType.checkmark : UITableViewCellAccessoryType.none
     }
     
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return resultsController.sections!.count
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if hasSortType && indexPath.section == Section.Sort.rawValue {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "SortCell", for: indexPath)
+            configureSortCell(cell: cell, indexPath: indexPath as NSIndexPath)
+            return cell
+        } else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "TagCell", for: indexPath)
+            configureTagCell(cell: cell as! TagTableViewCell, indexPath: indexPath as NSIndexPath)
+            return cell
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if hasSortType && section == Section.Sort.rawValue {
+            return "Sort by"
+        } else if hasSortType {
+            return "Tags"
+        }
+        return nil
+    }
+
+    func numberOfSections(in tableView: UITableView) -> Int {
+        if hasSortType {
+            return Section.Count.rawValue
+        } else {
+            return 1
+        }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if hasSortType && section == Section.Sort.rawValue {
+            return SortType.TypeCount.rawValue
+        }
+        
         guard let sections = resultsController.sections else {
             fatalError("No sections in fetchedResultsController")
         }
-        let sectionInfo = sections[section]
+        let sectionInfo = sections[0]
         // print("Returning number of row: \(sectionInfo.numberOfObjects)")
         return sectionInfo.numberOfObjects
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selectedObject = resultsController.object(at: indexPath as IndexPath) as Tag
-        setTagEnabled(tag: selectedObject, enabled: !isTagSelected(tag: selectedObject))
-        tableView.reloadRows(at: [indexPath], with: .none)
-        tableView.deselectRow(at: indexPath, animated: true)
+        if hasSortType && indexPath.section == Section.Sort.rawValue {
+            sort = SortType(rawValue: indexPath.row)!
+            tableView.reloadSections(NSIndexSet(index: indexPath.section) as IndexSet, with: .none)
+        } else {
+            let selectedObject = tagAtIndexPath(indexPath: mapFRCIndexPathToTableIndexPath(indexPath: indexPath))
+            setTagEnabled(tag: selectedObject, enabled: !isTagSelected(tag: selectedObject))
+            tableView.reloadRows(at: [indexPath], with: .none)
+            tableView.deselectRow(at: indexPath, animated: true)
+        }
     }
 }
 
@@ -208,9 +276,9 @@ extension TagsViewController : NSFetchedResultsControllerDelegate {
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
         switch type {
         case .insert:
-            tableView.insertSections(NSIndexSet(index: sectionIndex) as IndexSet, with: .fade)
+            tableView.insertSections(NSIndexSet(index: hasSortType ? Section.Tags.rawValue : 0) as IndexSet, with: .fade)
         case .delete:
-            tableView.deleteSections(NSIndexSet(index: sectionIndex) as IndexSet, with: .fade)
+            tableView.deleteSections(NSIndexSet(index: hasSortType ? Section.Tags.rawValue : 0) as IndexSet, with: .fade)
         case .move:
             break
         case .update:
@@ -221,16 +289,16 @@ extension TagsViewController : NSFetchedResultsControllerDelegate {
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         switch type {
         case .insert:
-            tableView.insertRows(at: [newIndexPath! as IndexPath], with: .fade)
+            tableView.insertRows(at: [mapFRCIndexPathToTableIndexPath(indexPath: newIndexPath!)], with: .fade)
         case .delete:
-            tableView.deleteRows(at: [indexPath! as IndexPath], with
+            tableView.deleteRows(at: [mapFRCIndexPathToTableIndexPath(indexPath: indexPath!)], with
                 : .fade)
         case .update:
-            if let cell = tableView.cellForRow(at: indexPath! as IndexPath) as? TagTableViewCell {
-                configureCell(cell: cell, indexPath: indexPath! as NSIndexPath)
+            if let cell = tableView.cellForRow(at: mapFRCIndexPathToTableIndexPath(indexPath: indexPath!)) as? TagTableViewCell {
+                configureTagCell(cell: cell, indexPath: mapFRCIndexPathToTableIndexPath(indexPath: indexPath!) as NSIndexPath)
             }
         case .move:
-            tableView.moveRow(at: indexPath! as IndexPath, to: newIndexPath! as IndexPath)
+            tableView.moveRow(at: mapFRCIndexPathToTableIndexPath(indexPath: indexPath!), to: mapFRCIndexPathToTableIndexPath(indexPath: newIndexPath!))
         }
     }
     

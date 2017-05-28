@@ -9,10 +9,27 @@
 import UIKit
 import CoreData
 
+enum SortType: Int {
+    case Created = 0
+    case Modified = 1
+    case Title = 2
+    case TypeCount
+}
+
 class NotesViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
     var searchBar: UISearchBar!
+    
+    var sort: SortType {
+        get {
+            return SortType(rawValue: UserDefaults.standard.integer(forKey: "SortType"))!
+        }
+        set {
+            UserDefaults.standard.set(newValue.rawValue, forKey: "SortType")
+            UserDefaults.standard.synchronize()
+        }
+    }
     
     var resultsController: NSFetchedResultsController<Note>!
     var selectedTags = [Tag]()
@@ -55,7 +72,7 @@ class NotesViewController: UIViewController {
     }
     
     func configureNavBar() {
-        let tagsTitle = selectedTags.count > 0 ? "Tags (\(selectedTags.count))" : "Tags"
+        let tagsTitle = selectedTags.count > 0 ? "Filter (\(selectedTags.count))" : "Filter"
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: tagsTitle, style: .plain, target: self, action: #selector(tagsPressed))
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New", style: .plain, target: self, action: #selector(newPressed))
     }
@@ -103,8 +120,11 @@ class NotesViewController: UIViewController {
     
     func tagsPressed() {
         let tags = self.storyboard?.instantiateViewController(withIdentifier: "Tags") as! TagsViewController
+        tags.hasSortType = true
+        tags.sort = sort
         tags.setInitialSelectedTags(tags: self.selectedTags)
-        tags.selectionCompletion = { tags in
+        tags.selectionCompletion = { tags, sort in
+            self.sort = sort!
             self.selectedTags = tags
             self.reloadResults()
             self.configureNavBar()
@@ -122,6 +142,19 @@ class NotesViewController: UIViewController {
         let compose = self.storyboard?.instantiateViewController(withIdentifier: "Compose") as! ComposeViewController
         compose.note = note        
         self.navigationController?.pushViewController(compose, animated: true)
+    }
+    
+    func sortKey() -> String {
+        switch sort {
+        case .Created:
+            return "createdAt"
+        case .Modified:
+            return "updatedAt"
+        case .Title:
+            return "title"
+        default:
+            return "createdAt"
+        }
     }
     
     func reloadResults() {
@@ -148,9 +181,12 @@ class NotesViewController: UIViewController {
                 predicates.append(tagPredicate)
             }
         }
-        
-        let sort = NSSortDescriptor(key: "createdAt", ascending: false)
-        fetchRequest.sortDescriptors = [sort]
+
+//        if sort == .Title {
+//            fetchRequest.sortDescriptors = [NSSortDescriptor(key: sortKey(), ascending: true, selector: #selector(NSString.caseInsensitiveCompare(_:)))]
+//        } else {
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: sortKey(), ascending: sort == .Title ? true : false)]
+//        }
         
         if predicates.count > 0 {
             let searchPredicates = NSCompoundPredicate(orPredicateWithSubpredicates: predicates)

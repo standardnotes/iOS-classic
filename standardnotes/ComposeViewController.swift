@@ -126,7 +126,8 @@ class ComposeViewController: UIViewController {
     func tagsPressed() {
         let tags = self.storyboard?.instantiateViewController(withIdentifier: "Tags") as! TagsViewController
         tags.setInitialSelectedTags(tags: self.note.tags?.allObjects as! [Tag])
-        tags.selectionCompletion = { tags in
+        tags.hasSortType = false
+        tags.selectionCompletion = { tags, sort in
             self.note.replaceTags(withTags: tags)
             self.configureNavBar()
             self.save()
