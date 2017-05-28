@@ -10,13 +10,25 @@ import UIKit
 import CoreData
 import LocalAuthentication
 import HockeySDK
-
+import StoreKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     weak var lockOutAlertVC: UIAlertController?
+    
+    let numRunsBeforeAskingForReview = 5
+    
+    var runCount: Int {
+        get {
+            return UserDefaults.standard.integer(forKey: "runCount")
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "runCount")
+            UserDefaults.standard.synchronize()
+        }
+    }
     
     static let sharedContext: NSManagedObjectContext = {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -33,7 +45,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         attemptFingerPrint()
         initializeCrashReporting()
         SyncController.sharedInstance.startSyncing()
+        handleAppStoreReviewLogic()
         return true
+    }
+    
+    func handleAppStoreReviewLogic() {
+        if #available(iOS 10.3, *) {
+            runCount += 1
+            if(runCount == numRunsBeforeAskingForReview) {
+                SKStoreReviewController.requestReview()
+            }
+        }
     }
     
     func initializeCrashReporting() {
