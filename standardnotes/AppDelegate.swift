@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     weak var lockOutAlertVC: UIAlertController?
     
-    let numRunsBeforeAskingForReview = 5
+    let numRunsBeforeAskingForReview = [5, 20, 50]
     
     var runCount: Int {
         get {
@@ -52,7 +52,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func handleAppStoreReviewLogic() {
         if #available(iOS 10.3, *) {
             runCount += 1
-            if(runCount == numRunsBeforeAskingForReview) {
+            if(numRunsBeforeAskingForReview.contains(runCount)) {
                 SKStoreReviewController.requestReview()
             }
         }
