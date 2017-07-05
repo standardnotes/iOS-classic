@@ -75,7 +75,7 @@ class ApiController {
         let salt = authParams["pw_salt"] as! String
         let cost = authParams["pw_cost"] as! Int
         
-        let result = Crypto.sharedInstance.pbkdf2(hash: CCPBKDFAlgorithm(kCCPRFHmacAlgSHA512), password: password, salt: salt, keyByteCount: 768/8, rounds: cost)!
+        let result = Crypto.sharedInstance.pbkdf2(password: password, salt: salt, rounds: cost)!
         
         let splitKeys = splitKeysFromKey(key: result)
         let pw = splitKeys[0], mk = splitKeys[1], ak = splitKeys[2]
@@ -122,7 +122,7 @@ class ApiController {
 				return
 			}
 
-            let result = Crypto.sharedInstance.pbkdf2(hash: CCPBKDFAlgorithm(kCCPRFHmacAlgSHA512), password: password, salt: salt, keyByteCount: 768/8, rounds: cost)!
+            let result = Crypto.sharedInstance.pbkdf2(password: password, salt: salt, rounds: cost)!
             
             let splitKeys = self.splitKeysFromKey(key: result)
             let pw = splitKeys[0], mk = splitKeys[1], ak = splitKeys[2]

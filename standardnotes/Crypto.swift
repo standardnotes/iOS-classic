@@ -22,10 +22,10 @@ class Crypto {
         ]
     }
     
-    func pbkdf2(hash :CCPBKDFAlgorithm, password: String, salt: String, keyByteCount: Int, rounds: Int) -> String? {
+    func pbkdf2(password: String, salt: String, rounds: Int) -> String? {
         let saltData = salt.data(using: .utf8)!
         let passwordData = password.data(using:String.Encoding.utf8)!
-        var derivedKeyData = Data(repeating:0, count:keyByteCount)
+        var derivedKeyData = Data(repeating:0, count:768/8)
         
         let derivationStatus = derivedKeyData.withUnsafeMutableBytes {derivedKeyBytes in
             saltData.withUnsafeBytes { saltBytes in
@@ -34,7 +34,7 @@ class Crypto {
                     CCPBKDFAlgorithm(kCCPBKDF2),
                     password, passwordData.count,
                     saltBytes, saltData.count,
-                    hash,
+                    CCPBKDFAlgorithm(kCCPRFHmacAlgSHA512),
                     UInt32(rounds),
                     derivedKeyBytes, derivedKeyData.count)
             }

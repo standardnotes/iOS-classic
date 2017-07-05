@@ -34,15 +34,15 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
     let ActionIndex = 3
     
     override func viewDidLoad() {
-        super.viewDidLoad()
+		super.viewDidLoad()
 		if UserManager.sharedInstance.signedIn {
 			checkForSecurityUpdate()
 		}
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        reloadData()
+		super.viewWillAppear(animated)
+		reloadData()
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -52,7 +52,6 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
 	func checkForSecurityUpdate() {
 		if UserManager.sharedInstance.authTag == nil {
 			self.showConfirmationAlert(style: .alert, sourceView: nil, title: "Security Update Available", message: "A security update is available for your account.", confirmString: "Learn More", confirmBlock: { 
-				
 				let sf = SFSafariViewController(url: URL(string: "https://standardnotes.org/verification")!)
 				sf.modalPresentationStyle = UIModalPresentationStyle.fullScreen
 				self.present(sf, animated: true, completion: nil)
