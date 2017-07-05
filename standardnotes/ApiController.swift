@@ -46,7 +46,6 @@ class ApiController {
             }
             let json = JSON(data: response.data!)
             completion(json, nil)
-            
         }
     }
     
@@ -57,19 +56,37 @@ class ApiController {
     func createRegistrationAuthParams(forEmail email: String) -> [String : AnyObject] {
         let pwParams = Crypto.sharedInstance.defaultPasswordGenerationParams()
         let nonce = Crypto.sharedInstance.generateRandomHexKey(size: 256)
-        let salt = Crypto.sharedInstance.sha1(message: email + "SN" + nonce);
-        return pwParams.merged(with: ["pw_salt" : salt, "pw_nonce" : nonce]) as [String : AnyObject]
+        let salt = Crypto.sharedInstance.sha1(message: [email, nonce].joined(separator: ":"));
+        return pwParams.merged(with: ["pw_salt" : salt]) as [String : AnyObject]
+    }
+    
+    func splitKeysFromKey(key: String) -> [String] {
+        let resultLength = key.characters.count
+        let splitLength = resultLength/3
+        let pw = key.substring(with: Range.init(uncheckedBounds: (lower: 0, upper: splitLength)))
+        let mk = key.substring(with: Range.init(uncheckedBounds: (lower: splitLength, upper: splitLength * 2)))
+        let ak = key.substring(with: Range.init(uncheckedBounds: (lower: splitLength * 2, upper: splitLength * 3)))
+        return [pw, mk, ak]
     }
     
     func register(email: String, password: String, completion: @escaping (String?) -> ()) {
-
-        var authParams = createRegistrationAuthParams(forEmail: email)
-        let result = Crypto.sharedInstance.pbkdf2(hash: CCPBKDFAlgorithm(kCCPRFHmacAlgSHA512), password: password, salt: authParams["pw_salt"] as! String, keyByteCount: (authParams["pw_key_size"] as! Int)/8, rounds: authParams["pw_cost"] as! Int)!
         
-        let pw = result.firstHalf()
-        let mk = result.secondHalf()
+        var authParams = createRegistrationAuthParams(forEmail: email)
+        let salt = authParams["pw_salt"] as! String
+        let cost = authParams["pw_cost"] as! Int
+        
+        let result = Crypto.sharedInstance.pbkdf2(hash: CCPBKDFAlgorithm(kCCPRFHmacAlgSHA512), password: password, salt: salt, keyByteCount: 768/8, rounds: cost)!
+        
+        let splitKeys = splitKeysFromKey(key: result)
+        let pw = splitKeys[0], mk = splitKeys[1], ak = splitKeys[2]
+        
         UserManager.sharedInstance.mk = mk
+        UserManager.sharedInstance.ak = ak
         UserManager.sharedInstance.save()
+        
+        let authString = [String(cost), salt].joined(separator:":")
+        let pw_auth = Crypto.sharedInstance.authHashString(encryptedContent: authString, authKey: ak)
+        authParams["pw_auth"] = pw_auth as AnyObject
         
         let parameters: Parameters = ["email": email, "password" : pw].merged(with: authParams)
         
@@ -83,13 +100,12 @@ class ApiController {
                     return
                 }
                 UserManager.sharedInstance.jwt = json["token"].string!
-                authParams.removeValue(forKey: "pw_nonce")
                 UserManager.sharedInstance.authParams = authParams
                 UserManager.sharedInstance.save()
                 completion(nil)
         }
     }
-    
+	
     func signInUser(email: String, password: String, completion: @escaping (String?, Bool) -> ()) {
         getAuthParams(email: email) { (authParams, error) in
             
@@ -97,32 +113,64 @@ class ApiController {
                 completion("An unknown error occured.", false)
                 return
             }
+            
+            let salt = authParams!["pw_salt"].string!
+            let cost = authParams!["pw_cost"].int!
+			
+			if cost < Crypto.sharedInstance.MinimumCost {
+				UIAlertController.showAlertOnRootController(title: "Invalid Parameters", message: "The server has sent invalid login parameters. Please contact the server administrator to resolve this issue.")
+				return
+			}
 
-            let result = Crypto.sharedInstance.pbkdf2(hash: CCPBKDFAlgorithm(kCCPRFHmacAlgSHA512), password: password, salt: authParams!["pw_salt"].string!, keyByteCount: authParams!["pw_key_size"].int!/8, rounds: authParams!["pw_cost"].int!)!
-            let pw = result.firstHalf()
-            let mk = result.secondHalf()
+            let result = Crypto.sharedInstance.pbkdf2(hash: CCPBKDFAlgorithm(kCCPRFHmacAlgSHA512), password: password, salt: salt, keyByteCount: 768/8, rounds: cost)!
+            
+            let splitKeys = self.splitKeysFromKey(key: result)
+            let pw = splitKeys[0], mk = splitKeys[1], ak = splitKeys[2]
+            
             UserManager.sharedInstance.mk = mk
+			UserManager.sharedInstance.ak = ak
             UserManager.sharedInstance.save()
-            
-            let parameters: Parameters = ["email": email, "password" : pw]
-            
-            Alamofire.request("\(self.server)/auth/sign_in", method: .post, parameters: parameters)
-                .validate(statusCode: 200..<300)
-                .responseJSON { response in
-                    let json = JSON(data: response.data!)
-                    if response.result.error != nil {
-                        let responseString = String(data: response.data!, encoding: .utf8)
-                        print("Sign in error: \(responseString!)")
-                        
-                        let error = json["error"].dictionary
-                        completion(error?["message"]?.string, false)
-                        return
-                    }
-                    UserManager.sharedInstance.jwt = json["token"].string!
-                    UserManager.sharedInstance.authParams = authParams?.object as! [String : Any]?
-                    UserManager.sharedInstance.save()
-                    completion(nil, true)
+			
+			let localAuth = Crypto.sharedInstance.authHashString(encryptedContent: [String(cost), salt].joined(separator:":"), authKey: ak)
+			
+			let signInBlock = {() -> Void in
+				let parameters: Parameters = ["email": email, "password" : pw]
+				
+				Alamofire.request("\(self.server)/auth/sign_in", method: .post, parameters: parameters)
+					.validate(statusCode: 200..<300)
+					.responseJSON { response in
+						let json = JSON(data: response.data!)
+						if response.result.error != nil {
+							let responseString = String(data: response.data!, encoding: .utf8)
+							print("Sign in error: \(responseString!)")
+							
+							let error = json["error"].dictionary
+							completion(error?["message"]?.string, false)
+							return
+						}
+						
+						UserManager.sharedInstance.jwt = json["token"].string!
+						UserManager.sharedInstance.authParams = authParams?.object as! [String : Any]?
+						UserManager.sharedInstance.save()
+						completion(nil, true)
+				}
+			}
+			
+			
+            if let pw_auth = authParams!["pw_auth"].string, pw_auth.characters.count > 0 {
+                if(pw_auth != localAuth) {
+                    completion("Invalid server verification tag; aborting login. Learn more at standardnotes.org/verification.", false)
+                    return
+                } else {
+                    print("Verification tag success.")
+					signInBlock()
+                }
+            } else {
+				UIAlertController.showConfirmationAlertOnRootController(title: "Verification Tag Not Found", message: "Cannot verify authenticity of server parameters. Please visit standardnotes.org/verification to learn more. Do you wish to continue login?", confirmString: "Login Anyway", confirmBlock: {Void in
+					signInBlock()
+				})
             }
+		
         }
     }
     
@@ -209,7 +257,9 @@ class ApiController {
         params["uuid"] = item.uuid
         params["deleted"] = item.modelDeleted
         
-        let encryptionVersion = "001"
+		let encryptionVersion = UserManager.sharedInstance.authTag != nil ? "002" : "001"
+		
+		print("Encrypting with version: \(encryptionVersion)")
         
         if(encrypted) {
             // send encrypted

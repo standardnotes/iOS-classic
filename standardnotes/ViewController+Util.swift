@@ -48,3 +48,17 @@ extension UIViewController {
         self.present(alertController, animated: true, completion: nil)
     }
 }
+
+extension UIAlertController {
+	
+	class func showConfirmationAlertOnRootController(title: String, message: String, confirmString: String, confirmBlock: @escaping (() -> ())) {
+		
+		AppDelegate.sharedInstance.window?.rootViewController?.showConfirmationAlert(style: .alert, sourceView: nil, title: title, message: message, confirmString: confirmString, confirmBlock: confirmBlock)
+		
+	}
+	
+	class func showAlertOnRootController(title: String, message: String) {
+		AppDelegate.sharedInstance.window?.rootViewController?.showAlert(title: title, message: message)
+	}
+	
+}

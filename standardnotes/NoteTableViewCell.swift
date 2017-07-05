@@ -36,6 +36,12 @@ class NoteTableViewCell: UITableViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
+		
+		if note.errorDecrypting {
+			titleLabel.textColor = UIColor.red
+		} else {
+			titleLabel.textColor = UIColor.black
+		}
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

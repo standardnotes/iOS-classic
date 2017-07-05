@@ -279,10 +279,15 @@ extension NotesViewController : UITableViewDelegate, UITableViewDataSource {
             return
         }
         let selectedObject = resultsController.object(at: indexPath as IndexPath) as Note
-        cell.titleLabel?.text = selectedObject.safeTitle()
+		if selectedObject.errorDecrypting {
+			cell.titleLabel?.text = "Error decrypting"
+		} else {
+			cell.titleLabel?.text = selectedObject.safeTitle()
+		}
         cell.contentLabel?.text = selectedObject.safeText()
         cell.dateLabel?.text = selectedObject.humanReadableCreateDate()
         cell.note = selectedObject
+		
         cell.longPressHandler = { cell in
             self.presentActionSheetForNote(note: cell.note)
         }
@@ -307,9 +312,13 @@ extension NotesViewController : UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		tableView.deselectRow(at: indexPath, animated: true)
         let selectedObject = resultsController.object(at: indexPath as IndexPath) as Note
+		if selectedObject.errorDecrypting {
+			self.showAlert(title: "Unable to Decrypt", message: "There was an error decrypting this item. Ensure you are running the latest version of this app, then sign out and sign back in to try again.")
+			return
+		}
         presentComposer(note: selectedObject)
-        tableView.deselectRow(at: indexPath, animated: true)
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
