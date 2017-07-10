@@ -13,26 +13,19 @@ class Crypto {
     static let sharedInstance : Crypto = {
         return Crypto()
     }()
+	
+	let MinimumCost = 3000
     
     func defaultPasswordGenerationParams() -> [String : Any] {
         return [
-              "pw_func" : "pbkdf2",
-              "pw_alg": "sha512",
-              "pw_key_size": 512,
-              "pw_cost": 5000
+            "pw_cost": 5000
         ]
     }
     
-    func generateKeysFromMasterKey(masterKey: String) -> Keys {
-        let encryptionKey = HMAC256(masterKey.data(using: .utf8), "e".data(using: .utf8))
-        let authKey = HMAC256(masterKey.data(using: .utf8), "a".data(using: .utf8))
-        return Keys.init(mk: masterKey, encryptionKey: encryptionKey!.hexEncodedString(), authKey: authKey!.hexEncodedString())
-    }
-    
-    func pbkdf2(hash :CCPBKDFAlgorithm, password: String, salt: String, keyByteCount: Int, rounds: Int) -> String? {
+    func pbkdf2(password: String, salt: String, rounds: Int) -> String? {
         let saltData = salt.data(using: .utf8)!
         let passwordData = password.data(using:String.Encoding.utf8)!
-        var derivedKeyData = Data(repeating:0, count:keyByteCount)
+        var derivedKeyData = Data(repeating:0, count:768/8)
         
         let derivationStatus = derivedKeyData.withUnsafeMutableBytes {derivedKeyBytes in
             saltData.withUnsafeBytes { saltBytes in
@@ -41,7 +34,7 @@ class Crypto {
                     CCPBKDFAlgorithm(kCCPBKDF2),
                     password, passwordData.count,
                     saltBytes, saltData.count,
-                    hash,
+                    CCPBKDFAlgorithm(kCCPRFHmacAlgSHA512),
                     UInt32(rounds),
                     derivedKeyBytes, derivedKeyData.count)
             }
@@ -109,9 +102,9 @@ class Crypto {
         } else {
             let iv = generateRandomHexKey(size: 128)
             let cipherText = encrypt(message: itemKey, key: UserManager.sharedInstance.keys.encryptionKey, iv: iv)
-            let stringToAuth = [version, iv, cipherText].joined(separator: ":")
+            let stringToAuth = [version, item.uuid, iv, cipherText].joined(separator: ":")
             let authHash = authHashString(encryptedContent: stringToAuth, authKey: UserManager.sharedInstance.keys.authKey)
-            item.encItemKey = [version, authHash, iv, cipherText].joined(separator: ":")
+            item.encItemKey = [version, authHash, item.uuid, iv, cipherText].joined(separator: ":")
         }
         
         params["enc_item_key"] = item.encItemKey!
@@ -126,9 +119,9 @@ class Crypto {
         } else {
             let iv = generateRandomHexKey(size: 128)
             let cipherText = encrypt(message: message, key: ek, iv: iv)
-            let stringToAuth = [version, iv, cipherText].joined(separator: ":")
+            let stringToAuth = [version, item.uuid, iv, cipherText].joined(separator: ":")
             let authHash = authHashString(encryptedContent: stringToAuth, authKey: ak)
-            params["content"] = [version, authHash, iv, cipherText].joined(separator: ":")
+            params["content"] = [version, authHash, item.uuid, iv, cipherText].joined(separator: ":")
             params["auth_hash"] = NSNull()
         }
         return params
@@ -159,6 +152,7 @@ class Crypto {
     struct EncryptionComponents {
         var version: String
         var authHash: String
+        var uuid: String?
         var iv: String?
         var ciphertext: String
         var stringToAuth: String
@@ -166,12 +160,12 @@ class Crypto {
     
     func encryptionComponents(fromString string: String) -> EncryptionComponents {
         let comps = string.components(separatedBy: ":")
-        let version = comps[0], authHash = comps[1], iv = comps[2], ciphertext = comps[3]
-        let stringToAuth = [version, iv, ciphertext].joined(separator: ":")
-        return EncryptionComponents.init(version: version, authHash: authHash, iv: iv, ciphertext: ciphertext, stringToAuth: stringToAuth)
+        let version = comps[0], authHash = comps[1], uuid = comps[2], iv = comps[3], ciphertext = comps[4]
+        let stringToAuth = [version, uuid, iv, ciphertext].joined(separator: ":")
+        return EncryptionComponents.init(version: version, authHash: authHash, uuid: uuid, iv: iv, ciphertext: ciphertext, stringToAuth: stringToAuth)
     }
     
-    func itemKeys(fromEncryptedKey key: String) -> Keys? {
+	func itemKeys(fromEncryptedKey key: String, itemUUID: String) -> Keys? {
         var decryptedKey: String?
         if(key.hasPrefix("002") == false) {
             // legacy
@@ -180,6 +174,15 @@ class Crypto {
         } else {
             let components = encryptionComponents(fromString: key)
             let keys = UserManager.sharedInstance.keys
+            if(keys.authKey == nil) {
+                // user needs to sign out and sign back in
+                return nil
+            }
+			
+			if(components.uuid! != itemUUID) {
+				return nil
+			}
+			
             decryptedKey = decryptFromComponents(components: components, keys: keys)
         }
 
@@ -189,7 +192,7 @@ class Crypto {
         
         let ek = decryptedKey!.firstHalf()
         let ak = decryptedKey!.secondHalf()
-        return Keys.init(mk: nil, encryptionKey: ek, authKey: ak)
+        return Keys.init(encryptionKey: ek, authKey: ak)
     }
     
     func decryptItems(items: inout [JSON]){
@@ -204,8 +207,9 @@ class Crypto {
             
             if (encryptionVersion == "001" || encryptionVersion == "002"), let enc_key = item["enc_item_key"].string {
             
-                let keys = itemKeys(fromEncryptedKey: enc_key)
+				let keys = itemKeys(fromEncryptedKey: enc_key, itemUUID: item["uuid"].string!)
                 if(keys == nil) {
+					items[index]["error_decrypting"] = true
                     print("Error decrypting item, continuing.")
                     continue
                 }
@@ -215,16 +219,23 @@ class Crypto {
                 
                 var encryptionComps: EncryptionComponents
                 if(encryptionVersion == "001") {
-                    encryptionComps = EncryptionComponents.init(version: encryptionVersion!, authHash: item["auth_hash"].string!,
+                    encryptionComps = EncryptionComponents.init(version: encryptionVersion!, authHash: item["auth_hash"].string!, uuid: nil,
                                                                 iv: nil, ciphertext: contentToDecrypt, stringToAuth: content)
                 } else {
                     encryptionComps = encryptionComponents(fromString: content)
+					if(encryptionComps.uuid! != item["uuid"].string!) {
+						items[index]["error_decrypting"] = true
+						print("UUID does not match, skipping decryption.")
+						continue
+					}
                 }
-                
+				
                 let decryptedContent = decryptFromComponents(components: encryptionComps, keys: keys!)
                 if(decryptedContent != nil) {
                     items[index]["content"] = JSON(decryptedContent!)
-                }
+				} else {
+					items[index]["error_decrypting"] = true
+				}
             } else {
                 if let contentToDecode = item["content"].string?.substring(from: 3) {
                     if let decoded = Crypto.sharedInstance.base64decode(base64String: contentToDecode) {

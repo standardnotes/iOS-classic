@@ -9,9 +9,8 @@
 import Foundation
 
 struct Keys {
-    var mk: String?
     var encryptionKey: String
-    var authKey: String
+    var authKey: String!
 }
 
 class UserManager {
@@ -27,7 +26,7 @@ class UserManager {
         server = UserDefaults.standard.object(forKey: "server") as! String?
         jwt = UserDefaults.standard.object(forKey: "jwt") as! String?
         mk = UserDefaults.standard.object(forKey: "mk") as! String?
-        
+        ak = UserDefaults.standard.object(forKey: "ak") as! String?
         if server == nil {
             server = "https://sync.standardnotes.org"
         }
@@ -35,15 +34,19 @@ class UserManager {
     
     var email: String!
     var server: String!
-    var mk: String!
     var jwt: String!
-    
+    var mk: String!
+    var ak: String!
+	
+	var authTag: String? {
+		return self.authParams?["pw_auth"] as? String
+	}
 
     var _keys: Keys!
     var keys: Keys {
         get {
             if(_keys == nil) {
-                _keys = Crypto.sharedInstance.generateKeysFromMasterKey(masterKey: mk)
+                _keys = Keys.init(encryptionKey: mk, authKey: ak)
             }
             return _keys
         }
@@ -76,7 +79,19 @@ class UserManager {
         
         set {
             _authParams = newValue
-            UserDefaults.standard.setValue(newValue, forKey: "authParams")
+			
+			// clear null values
+			if _authParams != nil {
+				let keysToRemove = Array(_authParams!.keys).filter {
+					return _authParams?[$0]! == nil || _authParams?[$0]! is NSNull
+				}
+				
+				for key in keysToRemove {
+					_authParams!.removeValue(forKey: key)
+				}
+			}
+			
+            UserDefaults.standard.setValue(_authParams, forKey: "authParams")
         }
     }
     
@@ -85,6 +100,7 @@ class UserManager {
         UserDefaults.standard.set(server, forKey: "server")
         UserDefaults.standard.set(jwt, forKey: "jwt")
         UserDefaults.standard.set(mk, forKey: "mk")
+		UserDefaults.standard.set(ak, forKey: "ak")
         
         persist()
     }
@@ -102,10 +118,12 @@ class UserManager {
         UserDefaults.standard.removeObject(forKey: "password")
         UserDefaults.standard.removeObject(forKey: "jwt")
         UserDefaults.standard.removeObject(forKey: "mk")
+		UserDefaults.standard.removeObject(forKey: "ak")
         UserDefaults.standard.removeObject(forKey: "touchIDEnabled")
         
         self.email = nil
         self.mk = nil
+		self.ak = nil
         self.jwt = nil
         
         persist()

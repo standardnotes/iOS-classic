@@ -28,7 +28,13 @@ public class Item: NSManagedObject {
         if json["enc_item_key"] != JSON.null {
             self.encItemKey = json["enc_item_key"].string
         }
-        
+		
+		if let errorDecrypting = json["error_decrypting"].bool {
+			self.errorDecrypting = errorDecrypting
+		} else {
+			self.errorDecrypting = false
+		}
+		
         self.createdAt = dateFromString(string: json["created_at"].string!)
         self.updatedAt = dateFromString(string: json["updated_at"].string!)
 
