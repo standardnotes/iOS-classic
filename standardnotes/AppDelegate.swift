@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     weak var lockOutAlertVC: UIAlertController?
     
-    let numRunsBeforeAskingForReview = [5, 20, 50]
+    let numRunsBeforeAskingForReview = [6, 20, 50]
     
     var runCount: Int {
         get {
