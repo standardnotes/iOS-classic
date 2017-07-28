@@ -258,8 +258,6 @@ class ApiController {
         params["deleted"] = item.modelDeleted
         
 		let encryptionVersion = UserManager.sharedInstance.authTag != nil ? "002" : "001"
-		
-		print("Encrypting with version: \(encryptionVersion)")
         
         if(encrypted) {
             // send encrypted

@@ -125,6 +125,7 @@ class UserManager {
         self.mk = nil
 		self.ak = nil
         self.jwt = nil
+        _keys = nil
         
         persist()
     }
