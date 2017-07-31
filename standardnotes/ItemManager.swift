@@ -73,6 +73,15 @@ class ItemManager {
         return item!
     }
     
+    func createItem(json: JSON) -> Item {
+        let item = NSEntityDescription.insertNewObject(forEntityName: json["content_type"].string!, into: self.context) as! Item        
+        item.updateFromJSON(json: json)
+        if json["content"] != JSON.null {
+            resolveReferences(forItem: item)
+        }
+        return item
+    }
+    
     func findItem(uuid: String, contentType: String) -> Item? {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: contentType)
         fetchRequest.predicate = NSPredicate(format: "uuid = %@", uuid)

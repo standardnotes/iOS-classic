@@ -229,12 +229,55 @@ class ApiController {
                 let _ = self.handleItemsResponse(responseItems: json["retrieved_items"].array!, omitFields: nil)
                 // merge only metadata for saved items
                 let _ = self.handleItemsResponse(responseItems: json["saved_items"].array!, omitFields: ["content", "enc_item_key", "auth_hash"])
+                // handle unsaved items
+                if let unsaved = json["unsaved"].array, unsaved.count > 0 {
+                    self.handleUnsavedItems(responseMapping: unsaved)
+                }
                 completion(nil)
                 
                 self.syncToken = json["sync_token"].string!
             }
         }
+    }
+    
+    func handleItemsResponse(responseItems: [JSON], omitFields: [String]?) -> [Item] {
+        var _responseItems = responseItems
+        Crypto.sharedInstance.decryptItems(items: &_responseItems)
+        let items = ItemManager.sharedInstance.mapResponseItemsToLocalItems(responseItems: _responseItems, omitFields: omitFields)
+        return items
+    }
+    
+    func handleUnsavedItems(responseMapping: [JSON]) {
+        var performSync = false
         
+        for mapping in responseMapping {
+            let itemDic = mapping["item"];
+            if itemDic["deleted"].boolValue {
+                continue
+            }
+            let error = mapping["error"]
+            if error["tag"] == "sync_conflict" {
+                var items = [itemDic]
+                Crypto.sharedInstance.decryptItems(items: &items)
+                var conflicted = items[0]
+                if let original = ItemManager.sharedInstance.findItem(uuid: conflicted["uuid"].string!, contentType: conflicted["content_type"].string!) {
+                    // if item in question differs from the original, create a new item, otherwise discard changes
+                    let content = JSON(conflicted["content"].string!.data(using: .utf8, allowLossyConversion: false)!)
+                
+                    if original.createContentJSONFromProperties() != content {
+                        conflicted["uuid"] = JSON(UUID().uuidString)
+                        let dup = ItemManager.sharedInstance.createItem(json: conflicted)
+                        dup.dirty = true
+                        performSync = true
+                    }
+                }
+            }
+        }
+        
+        if performSync {
+            ItemManager.sharedInstance.saveContext()
+            SyncController.sharedInstance.performSync()
+        }
     }
     
     func createParamsFromItem(item: Item) -> [String : Any] {
@@ -274,13 +317,7 @@ class ApiController {
         
         return params
     }
-    
-    func handleItemsResponse(responseItems: [JSON], omitFields: [String]?) -> [Item] {
-        var _responseItems = responseItems
-        Crypto.sharedInstance.decryptItems(items: &_responseItems)
-        let items = ItemManager.sharedInstance.mapResponseItemsToLocalItems(responseItems: _responseItems, omitFields: omitFields)
-        return items
-    }
+
     
     
     func deleteItem(item: Item, completion: @escaping ((Error?) -> ())) {
