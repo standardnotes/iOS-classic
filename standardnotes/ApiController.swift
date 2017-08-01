@@ -39,12 +39,14 @@ class ApiController {
             "email": email,
         ]
       
-        Alamofire.request("\(self.server)/auth/params", method: .get, parameters: parameters).responseJSON { response in
+        Alamofire.request("\(self.server)/auth/params", method: .get, parameters: parameters)
+        .validate(statusCode: 200..<300)
+        .responseJSON { response in
+            let json = JSON(data: response.data!)
             if response.result.error != nil {
-                completion(nil, response.result.error)
+                completion(json, response.result.error)
                 return
             }
-            let json = JSON(data: response.data!)
             completion(json, nil)
         }
     }
@@ -107,12 +109,15 @@ class ApiController {
     }
 	
     func signInUser(email: String, password: String, completion: @escaping (String?, Bool) -> ()) {
-        getAuthParams(email: email) { (authParams, error) in
+        getAuthParams(email: email) { (json, error) in
             
             if error != nil {
-                completion("An unknown error occured.", false)
+                let error = json?["error"].dictionary
+                completion(error?["message"]?.string, false)
                 return
             }
+            
+            let authParams = json
             
             let salt = authParams!["pw_salt"].string!
             let cost = authParams!["pw_cost"].int!
@@ -159,7 +164,7 @@ class ApiController {
 			
             if let pw_auth = authParams!["pw_auth"].string, pw_auth.characters.count > 0 {
                 if(pw_auth != localAuth) {
-                    completion("Invalid server verification tag; aborting login. Learn more at standardnotes.org/verification.", false)
+                    completion("Invalid server verification tag; aborting login. Make sure your password is correct and try again. Learn more at standardnotes.org/verification.", false)
                     return
                 } else {
                     print("Verification tag success.")
@@ -224,6 +229,8 @@ class ApiController {
             } else {
                 ItemManager.sharedInstance.clearDirty(items: dirty)
                 let json = JSON(data: response.data!)
+                
+                print("Retrieved items: \(json["retrieved_items"].array!.count) Saved items: \(json["saved_items"].array!.count)")
                 
                 // merge retreived items completely
                 let _ = self.handleItemsResponse(responseItems: json["retrieved_items"].array!, omitFields: nil)
