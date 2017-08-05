@@ -37,10 +37,6 @@ class UserManager {
     var jwt: String!
     var mk: String!
     var ak: String!
-	
-	var authTag: String? {
-		return self.authParams?["pw_auth"] as? String
-	}
 
     var _keys: Keys!
     var keys: Keys {
@@ -49,6 +45,18 @@ class UserManager {
                 _keys = Keys.init(encryptionKey: mk, authKey: ak)
             }
             return _keys
+        }
+    }
+    
+    func protocolVersion() -> String {
+        if let version = authParams?["version"] {
+            return version as! String
+        }
+        
+        if (keys.authKey != nil) {
+            return "002"
+        } else {
+            return "001"
         }
     }
     
@@ -126,6 +134,7 @@ class UserManager {
 		self.ak = nil
         self.jwt = nil
         _keys = nil
+        _authParams = nil
         
         persist()
     }

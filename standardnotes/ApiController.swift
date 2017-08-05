@@ -86,10 +86,6 @@ class ApiController {
         UserManager.sharedInstance.ak = ak
         UserManager.sharedInstance.save()
         
-        let authString = [String(cost), salt].joined(separator:":")
-        let pw_auth = Crypto.sharedInstance.authHashString(encryptedContent: authString, authKey: ak)
-        authParams["pw_auth"] = pw_auth as AnyObject
-        
         let parameters: Parameters = ["email": email, "password" : pw].merged(with: authParams)
         
         Alamofire.request("\(self.server)/auth", method: .post, parameters: parameters)
@@ -107,6 +103,10 @@ class ApiController {
                 completion(nil)
         }
     }
+    
+    func costMinimumForVersion(version: String) -> Int {
+        return 3000
+    }
 	
     func signInUser(email: String, password: String, completion: @escaping (String?, Bool) -> ()) {
         getAuthParams(email: email) { (json, error) in
@@ -121,9 +121,17 @@ class ApiController {
             
             let salt = authParams!["pw_salt"].string!
             let cost = authParams!["pw_cost"].int!
+            let version = authParams!["version"].string!
+            
+            let supportedVersions = ["001", "002"]
+            if !supportedVersions.contains(version) {
+                UIAlertController.showAlertOnRootController(title: "Unsupported Account", message: "The protocol version associated with your account is outdated and no longer supported by this application. Please visit standardnotes.org/help/security-update for more information.")
+                return
+            }
 			
-			if cost < Crypto.sharedInstance.MinimumCost {
-				UIAlertController.showAlertOnRootController(title: "Invalid Parameters", message: "The server has sent invalid login parameters. Please contact the server administrator to resolve this issue.")
+            let minimum = self.costMinimumForVersion(version: version)
+			if cost < minimum {
+				UIAlertController.showAlertOnRootController(title: "Insecure Parameters", message: "Unable to login due to insecure password parameters. Please visit standardnotes.org/help/password-upgrade for more information.")
 				return
 			}
 
@@ -136,47 +144,28 @@ class ApiController {
 			UserManager.sharedInstance.ak = ak
             UserManager.sharedInstance.save()
 			
-			let localAuth = Crypto.sharedInstance.authHashString(encryptedContent: [String(cost), salt].joined(separator:":"), authKey: ak)
-			
-			let signInBlock = {() -> Void in
-				let parameters: Parameters = ["email": email, "password" : pw]
-				
-				Alamofire.request("\(self.server)/auth/sign_in", method: .post, parameters: parameters)
-					.validate(statusCode: 200..<300)
-					.responseJSON { response in
-						let json = JSON(data: response.data!)
-						if response.result.error != nil {
-							let responseString = String(data: response.data!, encoding: .utf8)
-							print("Sign in error: \(responseString!)")
-							
-							let error = json["error"].dictionary
-							completion(error?["message"]?.string, false)
-							return
-						}
-						
-						UserManager.sharedInstance.jwt = json["token"].string!
-						UserManager.sharedInstance.authParams = authParams?.object as! [String : Any]?
-						UserManager.sharedInstance.save()
-						completion(nil, true)
-				}
-			}
-			
-			
-            if let pw_auth = authParams!["pw_auth"].string, pw_auth.characters.count > 0 {
-                if(pw_auth != localAuth) {
-                    completion("Invalid server verification tag; aborting login. Make sure your password is correct and try again. Learn more at standardnotes.org/verification.", false)
-                    return
-                } else {
-                    print("Verification tag success.")
-					signInBlock()
-                }
-            } else {
-				UIAlertController.showConfirmationAlertOnRootController(title: "Verification Tag Not Found", message: "Cannot verify authenticity of server parameters. Please visit standardnotes.org/verification to learn more. Do you wish to continue login?", confirmString: "Login Anyway", confirmBlock: {Void in
-					signInBlock()
-				})
+            let parameters: Parameters = ["email": email, "password" : pw]
+            
+            Alamofire.request("\(self.server)/auth/sign_in", method: .post, parameters: parameters)
+                .validate(statusCode: 200..<300)
+                .responseJSON { response in
+                    let json = JSON(data: response.data!)
+                    if response.result.error != nil {
+                        let responseString = String(data: response.data!, encoding: .utf8)
+                        print("Sign in error: \(responseString!)")
+                        
+                        let error = json["error"].dictionary
+                        completion(error?["message"]?.string, false)
+                        return
+                    }
+                    
+                    UserManager.sharedInstance.jwt = json["token"].string!
+                    UserManager.sharedInstance.authParams = authParams?.object as! [String : Any]?
+                    UserManager.sharedInstance.save()
+                    completion(nil, true)
             }
-		
         }
+			
     }
     
     func headers() -> HTTPHeaders {
@@ -307,11 +296,11 @@ class ApiController {
         params["uuid"] = item.uuid
         params["deleted"] = item.modelDeleted
         
-		let encryptionVersion = UserManager.sharedInstance.authTag != nil ? "002" : "001"
+		let version = UserManager.sharedInstance.protocolVersion()
         
         if(encrypted) {
             // send encrypted
-            let encryptedParams = Crypto.sharedInstance.encryptionParams(forItem: item, version: encryptionVersion)
+            let encryptedParams = Crypto.sharedInstance.encryptionParams(forItem: item, version: version)
             if(encryptedParams != nil) {
                 params.merge(with: encryptedParams!)
             }

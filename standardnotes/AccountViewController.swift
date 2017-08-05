@@ -50,9 +50,9 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
     }
 	
 	func checkForSecurityUpdate() {
-		if UserManager.sharedInstance.authTag == nil {
+		if UserManager.sharedInstance.keys.authKey == nil {
 			self.showConfirmationAlert(style: .alert, sourceView: nil, title: "Security Update Available", message: "A security update is available for your account.", confirmString: "Learn More", confirmBlock: { 
-				let sf = SFSafariViewController(url: URL(string: "https://standardnotes.org/verification")!)
+				let sf = SFSafariViewController(url: URL(string: "https://standardnotes.org/help/security-upgrade")!)
 				sf.modalPresentationStyle = UIModalPresentationStyle.fullScreen
 				self.present(sf, animated: true, completion: nil)
 			})

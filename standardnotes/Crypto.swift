@@ -13,12 +13,11 @@ class Crypto {
     static let sharedInstance : Crypto = {
         return Crypto()
     }()
-	
-	let MinimumCost = 3000
     
     func defaultPasswordGenerationParams() -> [String : Any] {
         return [
-            "pw_cost": 5000
+            "pw_cost" : 102000,
+            "version" : "002"
         ]
     }
     
