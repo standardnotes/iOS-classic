@@ -219,8 +219,6 @@ class ApiController {
                 ItemManager.sharedInstance.clearDirty(items: dirty)
                 let json = JSON(data: response.data!)
                 
-                print("Retrieved items: \(json["retrieved_items"].array!.count) Saved items: \(json["saved_items"].array!.count)")
-                
                 // merge retreived items completely
                 let _ = self.handleItemsResponse(responseItems: json["retrieved_items"].array!, omitFields: nil)
                 // merge only metadata for saved items

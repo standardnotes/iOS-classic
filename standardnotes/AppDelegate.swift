@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     weak var lockOutAlertVC: UIAlertController?
     
-    let numRunsBeforeAskingForReview = [6, 20, 50]
+    let numRunsBeforeAskingForReview = [5, 20, 50]
     
     var runCount: Int {
         get {
@@ -73,8 +73,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+ 
         if UserManager.sharedInstance.touchIDEnabled {
-            navigateToAccountController(afterDelay: 0)
+            showLockedController()
         }
         SyncController.sharedInstance.stopSyncing()
     }
@@ -88,7 +89,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
         
-        
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
@@ -100,26 +100,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: - Core Data stack
 
     lazy var persistentContainer: NSPersistentContainer = {
-        /*
-         The persistent container for the application. This implementation
-         creates and returns a container, having loaded the store for the
-         application to it. This property is optional since there are legitimate
-         error conditions that could cause the creation of the store to fail.
-        */
+
         let container = NSPersistentContainer(name: "standardnotes")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                 
-                /*
-                 Typical reasons for an error here include:
-                 * The parent directory does not exist, cannot be created, or disallows writing.
-                 * The persistent store is not accessible, due to permissions or data protection when the device is locked.
-                 * The device is out of space.
-                 * The store could not be migrated to the current model version.
-                 Check the error message to determine what the actual problem was.
-                 */
+
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
         })
@@ -135,25 +120,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             do {
                 try context.save()
             } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
                 let nserror = error as NSError
                 fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
         }
     }
     
-    func navigateToAccountController(afterDelay: Double) {
-        // return tab to accounts page
-        delay(afterDelay) {
-            (UIApplication.shared.keyWindow?.rootViewController as? UITabBarController)?.selectedIndex = 1
+    var lockedVC: LockedViewController?
+    
+    func showLockedController() {
+        if self.lockedVC != nil {
+            return
         }
+    
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        self.lockedVC = storyboard.instantiateViewController(withIdentifier: "LockedVC") as? LockedViewController
+        (UIApplication.shared.keyWindow?.rootViewController?.topMostViewController())?.present(self.lockedVC!, animated: false, completion: nil)
     }
     
-    func navigateToNotesController(afterDelay: Double) {
+    func hideLockedController(afterDelay: Double) {
         // return tab to accounts page
         delay(afterDelay) {
-            (UIApplication.shared.keyWindow?.rootViewController as? UITabBarController)?.selectedIndex = 0
+            self.lockedVC?.dismiss(animated: true, completion: nil)
+            self.lockedVC = nil
         }
     }
     
@@ -163,7 +152,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         guard UserManager.sharedInstance.touchIDEnabled else { return }
         UIApplication.shared.beginIgnoringInteractionEvents()
         
-        navigateToAccountController(afterDelay: 0.1)
+        delay(0.01) {
+            self.showLockedController()
+        }
         
         let touchIDContext = LAContext()
         var error : NSError?
@@ -171,7 +162,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if touchIDContext.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error){
             touchIDContext.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reasonString, reply: { [weak self] (success, touchIDError) in
                 guard success else {
-                    print(error?.localizedDescription ?? "touch id error")
+                    print(error?.localizedDescription ?? "Touch ID Error")
                     OperationQueue.main.addOperation {
                         UIApplication.shared.endIgnoringInteractionEvents()
                         self?.presentLockAlert()
@@ -179,11 +170,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     return
                 }
                 UIApplication.shared.endIgnoringInteractionEvents()
-                self?.navigateToNotesController(afterDelay: 0.01)
+                self?.hideLockedController(afterDelay: 0.01)
             })
         } else {
-            UIApplication.shared.endIgnoringInteractionEvents()
-            print(error?.localizedDescription ?? "touch id error")
+            print(error?.localizedDescription ?? "Touch ID Error")
+            
+            // Do PIN code auth
+            let context = LAContext()
+            context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reasonString, reply: { [weak self] (success, error) in
+                guard success else {
+                    print(error?.localizedDescription ?? "Touch ID Error")
+                    OperationQueue.main.addOperation {
+                        UIApplication.shared.endIgnoringInteractionEvents()
+                        self?.presentLockAlert()
+                    }
+                    return
+                }
+                UIApplication.shared.endIgnoringInteractionEvents()
+                self?.hideLockedController(afterDelay: 0.01)
+
+            })
         }
         
     }
@@ -198,7 +204,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             self?.attemptFingerPrint()
         })
         alertController.addAction(retryTouchIDAction)
-        UIApplication.shared.keyWindow?.rootViewController?.present(alertController, animated: true, completion: nil)
+        self.lockedVC?.present(alertController, animated: true, completion: nil)
         lockOutAlertVC = alertController
         
     }

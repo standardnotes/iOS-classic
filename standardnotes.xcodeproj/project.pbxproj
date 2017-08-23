@@ -37,6 +37,7 @@
 		B89178E21E0D86D500163EA7 /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89178E11E0D86D500163EA7 /* TabBarViewController.swift */; };
 		B89178E41E0DBDC500163EA7 /* NoteTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89178E31E0DBDC500163EA7 /* NoteTableViewCell.swift */; };
 		B89178E81E0DC81500163EA7 /* TagTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89178E71E0DC81500163EA7 /* TagTableViewCell.swift */; };
+		CD2440CA1F4DE49C00425B6F /* LockedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2440C91F4DE49C00425B6F /* LockedViewController.swift */; };
 		CDAAB63F1E0DE3B30033487A /* ViewController+Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDAAB63E1E0DE3B30033487A /* ViewController+Util.swift */; };
 /* End PBXBuildFile section */
 
@@ -147,6 +148,7 @@
 		B89178E11E0D86D500163EA7 /* TabBarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
 		B89178E31E0DBDC500163EA7 /* NoteTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoteTableViewCell.swift; sourceTree = "<group>"; };
 		B89178E71E0DC81500163EA7 /* TagTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TagTableViewCell.swift; sourceTree = "<group>"; };
+		CD2440C91F4DE49C00425B6F /* LockedViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LockedViewController.swift; sourceTree = "<group>"; };
 		CDAAB63E1E0DE3B30033487A /* ViewController+Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ViewController+Util.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -175,6 +177,7 @@
 			isa = PBXGroup;
 			children = (
 				B82B6DFE1E08AA660025C3EC /* Main.storyboard */,
+				CD2440C91F4DE49C00425B6F /* LockedViewController.swift */,
 				B89178E51E0DBDC800163EA7 /* Notes */,
 				B89178E61E0DC80600163EA7 /* Tags */,
 				B80140921E12FFA00046082C /* Compose */,
@@ -480,6 +483,7 @@
 				B89178DE1E0D7D8300163EA7 /* AccountViewController.swift in Sources */,
 				B8046A731E2A8074006A5F03 /* Theme.swift in Sources */,
 				B89178DA1E0C9B9D00163EA7 /* Tag+CoreDataProperties.swift in Sources */,
+				CD2440CA1F4DE49C00425B6F /* LockedViewController.swift in Sources */,
 				B89178E81E0DC81500163EA7 /* TagTableViewCell.swift in Sources */,
 				B89178CE1E0C9A4D00163EA7 /* Tag+CoreDataClass.swift in Sources */,
 				B82B6E181E08AC8C0025C3EC /* ApiController.swift in Sources */,

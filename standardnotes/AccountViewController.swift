@@ -35,9 +35,6 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
     
     override func viewDidLoad() {
 		super.viewDidLoad()
-		if UserManager.sharedInstance.signedIn {
-			checkForSecurityUpdate()
-		}
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -48,16 +45,6 @@ class AccountViewController: UITableViewController, MFMailComposeViewControllerD
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
     }
-	
-	func checkForSecurityUpdate() {
-		if UserManager.sharedInstance.keys.authKey == nil {
-			self.showConfirmationAlert(style: .alert, sourceView: nil, title: "Security Update Available", message: "A security update is available for your account.", confirmString: "Learn More", confirmBlock: { 
-				let sf = SFSafariViewController(url: URL(string: "https://standardnotes.org/help/security-upgrade")!)
-				sf.modalPresentationStyle = UIModalPresentationStyle.fullScreen
-				self.present(sf, animated: true, completion: nil)
-			})
-		}
-	}
 	
     func reloadData() {
         
