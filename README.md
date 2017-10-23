@@ -1,8 +1,14 @@
-# Standard Notes for iOS
+# Deprecated
 
-This app can be downloaded from the iOS App Store [here](https://itunes.apple.com/us/app/standard-notes/id1191215138?ls=1&mt=8).
+__This codebase has been deprecated in favor of our new implementation, found here:__
 
-Or, easily run the app from Xcode on your device.
+[https://github.com/standardnotes/mobile](https://github.com/standardnotes/mobile)
+
+What follows remains online for historical reasons.
+
+# Standard Notes for iOS (Classic)
+
+Run the app from Xcode on your device.
 
 Simply clone this repo, then update git submodules:
 
